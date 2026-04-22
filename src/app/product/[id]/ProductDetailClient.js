@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useState, useCallback } from 'react';
 import ProductCard from '@/components/ProductCard';
@@ -69,11 +70,15 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           }}>{product.subcategory}</span>
         </div>
         {src && (
-          <img src={src} alt={`${product.name} - View ${index + 1}`}
+          <Image
+            src={src}
+            alt={`${product.name} - View ${index + 1}`}
+            fill
+            sizes="(max-width: 768px) 100vw, 60vw"
             style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', display: 'block',
-              opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease',
+              objectFit: 'cover',
+              opacity: isLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease',
             }}
             onLoad={() => handleImageLoad(index)}
             onError={() => handleImageError(index)}
@@ -96,11 +101,15 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           opacity: isLoaded ? 0 : 1, transition: 'opacity 0.3s ease',
         }} />
         {src && (
-          <img src={src} alt={`${product.name} thumb ${index + 1}`}
+          <Image
+            src={src}
+            alt={`${product.name} thumb ${index + 1}`}
+            fill
+            sizes="80px"
             style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              objectFit: 'cover', display: 'block',
-              opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease',
+              objectFit: 'cover',
+              opacity: isLoaded ? 1 : 0,
+              transition: 'opacity 0.3s ease',
             }}
             onLoad={() => handleImageLoad(index)}
             onError={() => handleImageError(index)}

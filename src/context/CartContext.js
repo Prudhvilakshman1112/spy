@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { computeCartTotals } from '@/lib/discounts';
 
 const CartContext = createContext(null);
 
@@ -42,8 +43,13 @@ export function CartProvider({ children }) {
     );
   }, []);
 
+  // Compute all totals (with category discounts) whenever items change
+  const cartTotals = useMemo(() => computeCartTotals(items), [items]);
+
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Keep `subtotal` as the original (pre-discount) total for backward compat
+  const subtotal = cartTotals.originalTotal;
 
   return (
     <CartContext.Provider
@@ -56,6 +62,12 @@ export function CartProvider({ children }) {
         updateQuantity,
         totalItems,
         subtotal,
+        // Discount-aware totals
+        originalTotal: cartTotals.originalTotal,
+        savingsByCategory: cartTotals.savingsByCategory,
+        totalSavings: cartTotals.totalSavings,
+        finalTotal: cartTotals.finalTotal,
+        itemBreakdown: cartTotals.itemBreakdown,
       }}
     >
       {children}

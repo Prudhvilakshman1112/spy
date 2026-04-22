@@ -606,6 +606,121 @@ h5, h6 {
 }
 
 /* ============================================
+   Discount Offer Ticker
+   ============================================ */
+.discount-banner {
+  position: relative;
+  background: var(--color-charcoal);       /* matches header bg exactly */
+  border-bottom: 2px solid var(--color-crimson);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 46px;
+}
+
+/* Fade edges */
+.discount-banner::before,
+.discount-banner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+.discount-banner::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-charcoal) 30%, transparent);
+}
+.discount-banner::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-charcoal) 30%, transparent);
+}
+
+/* Left label pill */
+.discount-banner-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--color-gold-light);
+  padding: 0 18px 0 20px;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  height: 100%;
+  z-index: 3;
+  background: var(--color-charcoal);
+}
+
+.discount-ticker-wrap {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.discount-ticker {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: ticker-scroll 32s linear infinite;
+  height: 100%;
+}
+
+.discount-ticker:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.discount-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 32px;
+  white-space: nowrap;
+  height: 100%;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.dt-emoji {
+  font-size: 0.9rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.dt-pct {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--color-crimson-light);
+}
+
+.dt-desc {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.65);
+  text-transform: uppercase;
+}
+
+.dt-sep {
+  color: var(--color-gold);
+  font-size: 0.5rem;
+  opacity: 0.5;
+}
+
+
+/* ============================================
    Atmosphere Cards (Home)
    ============================================ */
 .atmospheres-section {
@@ -1462,6 +1577,142 @@ h5, h6 {
   font-style: italic;
 }
 
+/* ── Per-item price row with discount ── */
+.cart-item-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.cart-item-price-original {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--color-gray-300);
+  text-decoration: line-through;
+}
+
+.cart-item-price-discounted {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  color: var(--color-crimson);
+}
+
+.cart-item-discount-badge {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #C41230, #9E0F27);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+
+.cart-item-line-total {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--color-gray-400);
+  margin-bottom: 2px;
+}
+
+.cart-item-line-saving {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* ── Bill breakdown ── */
+.cart-bill {
+  margin-bottom: var(--space-md);
+}
+
+.cart-bill-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  padding: 4px 0;
+  color: var(--color-gray-500);
+}
+
+.cart-bill-original {
+  color: var(--color-gray-400);
+  border-bottom: 1px dashed var(--color-gray-100);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.cart-bill-saving-row {
+  color: #16a34a;
+}
+
+.cart-bill-saving-amount {
+  font-weight: 600;
+}
+
+.cart-bill-you-save {
+  background: linear-gradient(90deg, rgba(22,163,74,0.10), rgba(22,163,74,0.05));
+  border: 1px solid rgba(22,163,74,0.25);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin: 6px 0;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: #16a34a;
+}
+
+.cart-bill-divider {
+  height: 1px;
+  background: var(--color-gray-200);
+  margin: 8px 0;
+}
+
+.cart-bill-total {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  color: var(--color-charcoal);
+  padding-top: 4px;
+}
+
+.cart-bill-total span:last-child {
+  color: var(--color-crimson);
+}
+
+/* ── WhatsApp Order Button (in cart) ── */
+.cart-whatsapp-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: filter var(--transition-normal), transform var(--transition-fast), box-shadow var(--transition-normal);
+  box-shadow: 0 4px 18px rgba(37,211,102,0.25);
+}
+
+.cart-whatsapp-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(37,211,102,0.4);
+}
+
+.cart-whatsapp-btn:active {
+  transform: translateY(0);
+}
+
+
 /* ============================================
    WhatsApp Widget
    ============================================ */
@@ -2023,4 +2274,139 @@ h5, h6 {
 @keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   404 Not Found Page
+   ============================================ */
+.not-found-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-deep-black);
+  overflow: hidden;
+}
+
+.not-found-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(196,18,48,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 60%, rgba(184,134,11,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(26,26,26,0.5) 0%, transparent 80%);
+}
+
+.not-found-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+.not-found-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 var(--space-xl);
+  max-width: 700px;
+}
+
+.not-found-code {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: var(--space-xl);
+  line-height: 1;
+}
+
+.not-found-4 {
+  font-family: var(--font-logo);
+  font-size: clamp(6rem, 18vw, 14rem);
+  color: var(--color-white);
+  opacity: 0.12;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 80px rgba(255,255,255,0.05);
+}
+
+.not-found-0 {
+  font-family: var(--font-logo);
+  font-size: clamp(7rem, 22vw, 16rem);
+  font-style: italic;
+  font-weight: 700;
+  color: var(--color-crimson);
+  text-shadow:
+    0 0 40px rgba(196,18,48,0.5),
+    0 0 100px rgba(196,18,48,0.2);
+  margin: 0 -8px;
+  animation: not-found-pulse 3s ease-in-out infinite;
+}
+
+@keyframes not-found-pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(196,18,48,0.5), 0 0 100px rgba(196,18,48,0.2); }
+  50% { opacity: 0.85; text-shadow: 0 0 60px rgba(196,18,48,0.7), 0 0 140px rgba(196,18,48,0.3); }
+}
+
+.not-found-divider {
+  width: clamp(120px, 40vw, 300px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-crimson), var(--color-gold), var(--color-crimson), transparent);
+  margin: 0 auto var(--space-xl);
+}
+
+.not-found-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  letter-spacing: 0.2em;
+  color: var(--color-white);
+  margin-bottom: var(--space-md);
+}
+
+.not-found-subtitle {
+  font-family: var(--font-subheading);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: var(--color-gray-300);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: var(--space-2xl);
+}
+
+.not-found-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.not-found-watermark {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-logo);
+  font-size: clamp(3rem, 12vw, 8rem);
+  color: rgba(255,255,255,0.02);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.not-found-watermark-2 {
+  color: rgba(196,18,48,0.05);
+  font-style: italic;
+  font-size: 1.3em;
+  margin: 0 -4px;
+}
+
+@media (max-width: 480px) {
+  .not-found-content {
+    padding: 0 var(--space-md);
+  }
+  .not-found-0 {
+    margin: 0 -4px;
+  }
 }

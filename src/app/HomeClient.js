@@ -2,9 +2,39 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import ProductCard from '@/components/ProductCard';
 import { useAtmosphere } from '@/context/AtmosphereContext';
+
+/* ── Animated Discount Banner ── */
+const BANNER_ITEMS = [
+  { emoji: '🎽', label: 'CLOTHING', pct: '10%', desc: 'Off All Clothing', color: '#C41230' },
+  { emoji: '👟', label: 'FOOTWEAR', pct: '20%', desc: 'Off All Footwear', color: '#B8860B' },
+  { emoji: '💎', label: 'ACCESSORIES', pct: '30%', desc: 'Off All Accessories', color: '#7C3AED' },
+];
+
+function DiscountBanner() {
+  // Duplicate items so the scroll loops seamlessly
+  const tickers = [...BANNER_ITEMS, ...BANNER_ITEMS, ...BANNER_ITEMS, ...BANNER_ITEMS];
+  return (
+    <div className="discount-banner" aria-label="Current promotions">
+      <div className="discount-banner-label">OFFERS</div>
+      <div className="discount-ticker-wrap">
+        <div className="discount-ticker">
+          {tickers.map((item, i) => (
+            <div className="discount-ticker-item" key={i}>
+              <span className="dt-emoji">{item.emoji}</span>
+              <span className="dt-pct">{item.pct}</span>
+              <span className="dt-desc">{item.desc}</span>
+              <span className="dt-sep">✦</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomeClient({ featured, newArrivals }) {
   const heroRef = useRef(null);
@@ -112,6 +142,9 @@ export default function HomeClient({ featured, newArrivals }) {
         </div>
       </section>
 
+      {/* DISCOUNT BANNER */}
+      <DiscountBanner />
+
       {/* ATMOSPHERES */}
       <section className="atmospheres-section" id="atmospheres">
         <div className="container">
@@ -207,15 +240,13 @@ export default function HomeClient({ featured, newArrivals }) {
                 VISIT OUR STORE
               </Link>
             </div>
-            <div className="brand-story-visual">
-              <img
+            <div className="brand-story-visual" style={{ position: 'relative' }}>
+              <Image
                 src="/products/logo/B2blogo.jpg"
                 alt="Brand 2 Brand Logo"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                style={{ objectFit: 'cover' }}
               />
             </div>
           </div>

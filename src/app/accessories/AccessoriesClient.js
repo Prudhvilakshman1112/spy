@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import { useAtmosphere } from '@/context/AtmosphereContext';
 
@@ -28,15 +29,13 @@ export default function AccessoriesClient({ menWatches, womenWatches, bags }) {
       <section className="accessories-hero" id="watch-showcase">
         <div className="container">
           <div className="watch-showcase">
-            <div className="watch-showcase-image">
-              <img
+            <div className="watch-showcase-image" style={{ position: 'relative' }}>
+              <Image
                 src="/images/watch-showcase.png"
                 alt="Luxury timepiece showcase"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                style={{ objectFit: 'cover' }}
               />
             </div>
             <div className="watch-showcase-content">

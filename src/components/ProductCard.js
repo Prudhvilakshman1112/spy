@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 
 /**
@@ -73,11 +74,13 @@ export default function ProductCard({ product }) {
 
     if (src && !hasFailed) {
       return (
-        <img
+        <Image
           src={src}
           alt={`${product.name} - View ${index + 1}`}
           className={className}
-          loading="lazy"
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          style={{ objectFit: 'cover' }}
           onError={() => handleImageError(index)}
           draggable={false}
         />
@@ -137,10 +140,12 @@ export default function ProductCard({ product }) {
 
     if (src && !hasFailed) {
       return (
-        <img
+        <Image
           src={src}
           alt={`${product.name} thumb ${index + 1}`}
-          loading="lazy"
+          fill
+          sizes="48px"
+          style={{ objectFit: 'cover' }}
           onError={() => handleImageError(index)}
           draggable={false}
         />
