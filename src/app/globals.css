@@ -461,18 +461,87 @@ h5, h6 {
   padding-left: var(--space-md);
 }
 
+/* ── Mobile nav row (second row, mobile-only) ── */
+.header-mobile-nav {
+  display: none;   /* hidden on desktop */
+}
+
+/* Hide hamburger — no longer needed */
+.mobile-toggle  { display: none !important; }
+.mobile-menu    { display: none !important; }
+.mobile-menu-overlay { display: none !important; }
+
 @media (max-width: 768px) {
+  /* Tighten first row on mobile */
+  .header-inner {
+    height: 56px;
+    padding: 0 var(--space-md);
+  }
+
+  /* Logo slightly smaller on mobile */
+  .header-logo {
+    font-size: 1.25rem;
+  }
+  .header-logo .logo-2 {
+    font-size: 1.7rem;
+  }
+
+  /* Desktop nav stays hidden on mobile */
   .header-nav {
     display: none;
   }
-  .mobile-toggle {
+
+  /* ── Second row: full-width nav bar ── */
+  .header-mobile-nav {
     display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(13,13,13,0.97);
+    height: 40px;
+    padding: 0 var(--space-sm);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
-  .mobile-menu {
-    display: block;
+
+  .header-mobile-nav::-webkit-scrollbar {
+    display: none;
   }
-  .mobile-menu-overlay {
-    display: block;
+
+  .header-mobile-nav a {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray-200);
+    padding: 6px 10px;
+    position: relative;
+    white-space: nowrap;
+    transition: color var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .header-mobile-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    right: 10px;
+    height: 2px;
+    background: var(--color-crimson);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+  }
+
+  .header-mobile-nav a:hover,
+  .header-mobile-nav a.active {
+    color: var(--color-white);
+  }
+
+  .header-mobile-nav a:hover::after,
+  .header-mobile-nav a.active::after {
+    transform: scaleX(1);
   }
 }
 
@@ -1910,9 +1979,16 @@ h5, h6 {
    Page Transitions
    ============================================ */
 .page-content {
-  padding-top: 72px;
+  padding-top: 72px;      /* desktop: single 72px header row */
   min-height: 100vh;
 }
+
+@media (max-width: 768px) {
+  .page-content {
+    padding-top: 96px;    /* mobile: 56px logo row + 40px nav row */
+  }
+}
+
 
 /* ============================================
    Category Page Styles
