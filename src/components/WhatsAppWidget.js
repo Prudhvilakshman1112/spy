@@ -1,4 +1,13 @@
+'use client';
+
+import { useCart } from '@/context/CartContext';
+
 export default function WhatsAppWidget() {
+  const { isOpen } = useCart();
+
+  // Hide the floating button when the cart is open — cart has its own WhatsApp CTA
+  if (isOpen) return null;
+
   return (
     <a
       href="https://wa.me/918074548419?text=Hi%20Brand%20Two%20Brand!%20I'm%20interested%20in%20your%20products."
