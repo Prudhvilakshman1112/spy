@@ -20,6 +20,12 @@ export const products = [
       '/products/shirts/1/653708450_17898995796407338_7117762134364532222_n.jpg',
       '/products/shirts/1/653890948_17898995832407338_1447990606815323151_n.jpg',
     ],
+    // colorImages: maps each colour to its carousel index in `images[]`
+    // index 0 = cover (all colours together), 1+ = individual colour shots
+    colorImages: {
+      'Black': 1,
+      'Navy':  2,
+    },
   },
   {
     id: 'shirt-002',
@@ -39,6 +45,10 @@ export const products = [
       '/products/shirts/2/652772779_17898916962407338_2020798742231414796_n.jpg',
       '/products/shirts/2/652774100_17898916944407338_1782183215977825139_n.jpg',
     ],
+    colorImages: {
+      'White/Blue': 1,
+      'White/Grey': 2,
+    },
   },
   {
     id: 'shirt-003',
@@ -58,6 +68,10 @@ export const products = [
       '/products/shirts/3/651646487_17898511098407338_2235510785294967997_n.jpg',
       '/products/shirts/3/651752674_17898511068407338_1128419072619679100_n.jpg',
     ],
+    colorImages: {
+      'White/Green': 1,
+      'Cream/Blue':  2,
+    },
   },
   {
     id: 'shirt-004',
@@ -77,6 +91,11 @@ export const products = [
       '/products/shirts/4/649773913_17897947059407338_7777731556998918859_n.jpg',
       '/products/shirts/4/650220944_17897947047407338_3452300984456669186_n.jpg',
     ],
+    colorImages: {
+      'White':      0,
+      'Light Blue': 1,
+      'Pink':       2,
+    },
   },
   {
     id: 'shirt-005',
@@ -96,6 +115,9 @@ export const products = [
       '/products/shirts/5/649847084_17897912367407338_7409692509874705074_n.jpg',
       '/products/shirts/5/650134244_17897912397407338_7803089676417766917_n.jpg',
     ],
+    colorImages: {
+      'Black': 0,
+    },
   },
   {
     id: 'shirt-006',
@@ -115,6 +137,11 @@ export const products = [
       '/products/shirts/6/641771398_17896985085407338_3943083797370913406_n.jpg',
       '/products/shirts/6/642500050_17896985076407338_8004424778753884120_n.jpg',
     ],
+    colorImages: {
+      'Mint':     0,
+      'Peach':    1,
+      'Sky Blue': 2,
+    },
   },
 
   // ═══════════════════════════════════════════
@@ -138,6 +165,9 @@ export const products = [
       '/products/jeans/1/651061685_17898653853407338_7314555725827964414_n.jpg',
       '/products/jeans/1/651632102_17898653895407338_7391433155879392190_n.jpg',
     ],
+    colorImages: {
+      'Charcoal': 0,
+    },
   },
   {
     id: 'jeans-002',
@@ -157,6 +187,10 @@ export const products = [
       '/products/jeans/2/622113472_17891753622407338_7232810798027093273_n.jpg',
       '/products/jeans/2/622254779_17891753631407338_3027813790584895536_n.jpg',
     ],
+    colorImages: {
+      'Dark Indigo':  1,
+      'Medium Blue':  2,
+    },
   },
   {
     id: 'jeans-003',
@@ -176,6 +210,10 @@ export const products = [
       '/products/jeans/3/611292584_17889796767407338_7084810456017708497_n.jpg',
       '/products/jeans/3/611678659_17889796710407338_4512478654306926527_n.jpg',
     ],
+    colorImages: {
+      'Black':      1,
+      'Light Blue': 2,
+    },
   },
   {
     id: 'jeans-004',
@@ -195,6 +233,9 @@ export const products = [
       '/products/jeans/4/610622703_17889087681407338_3885442591387502714_n.jpg',
       '/products/jeans/4/610833833_17889087699407338_5287642713699373401_n.jpg',
     ],
+    colorImages: {
+      'Washed Blue': 0,
+    },
   },
 
   // ═══════════════════════════════════════════

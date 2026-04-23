@@ -3,8 +3,37 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
+
+// ── Colour name → CSS value lookup ──────────────────────────────────────────
+const COLOR_CSS = {
+  'black':       '#1A1A1A',
+  'navy':        '#1B3A6B',
+  'white':       '#F0F0F0',
+  'red':         '#C41230',
+  'blue':        '#2563EB',
+  'charcoal':    '#4A4A4A',
+  'indigo':      '#3B3B8C',
+  'dark indigo': '#1E1B6B',
+  'medium blue': '#4A78C4',
+  'mint':        '#98D4C4',
+  'peach':       '#FFCBA4',
+  'sky blue':    '#87CEEB',
+  'light blue':  '#93C5FD',
+  'pink':        '#F9A8D4',
+  'grey':        '#9CA3AF',
+  'gray':        '#9CA3AF',
+  'green':       '#16A34A',
+  'cream':       '#FFF8DC',
+  'washed blue': '#6B9EC5',
+  'multi':       'linear-gradient(135deg,#C41230,#F59E0B,#2563EB,#16A34A)',
+};
+
+function getColorCss(name) {
+  const key = name.toLowerCase().split('/')[0].trim();
+  return COLOR_CSS[key] || COLOR_CSS[name.toLowerCase()] || '#888';
+}
 
 function getPlaceholderGradient(id, index = 0) {
   const hash = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -13,31 +42,62 @@ function getPlaceholderGradient(id, index = 0) {
   return `linear-gradient(${135 + index * 45}deg, hsl(${hue1}, 25%, 85%) 0%, hsl(${hue2}, 20%, 75%) 100%)`;
 }
 
+// Short label for colour name
+function shortName(name) {
+  if (name.length <= 8) return name;
+  const first = name.split('/')[0].trim();
+  return first.length <= 8 ? first : first.slice(0, 7) + '…';
+}
+
 export default function ProductDetailClient({ product, relatedProducts }) {
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState(new Set());
+  const touchStartX = useRef(null);
 
   const images = product.images || [];
   const hasImages = images.length > 0;
+  const colorImages = product.colorImages || {};
+  const colors = product.colors || [];
+
+  // Only colours that have a real mapped image are shown as thumbs
+  const colorEntries = colors
+    .map(c => ({ color: c, idx: colorImages[c] }))
+    .filter(e => e.idx !== undefined && images[e.idx]);
 
   const handleImageLoad = useCallback((index) => {
-    setLoadedImages(prev => {
-      const next = new Set(prev);
-      next.add(index);
-      return next;
-    });
+    setLoadedImages(prev => { const n = new Set(prev); n.add(index); return n; });
   }, []);
 
   const handleImageError = useCallback((index) => {
-    setLoadedImages(prev => {
-      const next = new Set(prev);
-      next.delete(index);
-      return next;
-    });
+    setLoadedImages(prev => { const n = new Set(prev); n.delete(index); return n; });
   }, []);
+
+  const goTo = useCallback((idx) => {
+    setActiveImageIndex(Math.max(0, Math.min(idx, images.length - 1)));
+  }, [images.length]);
+
+  const goPrev = () => setActiveImageIndex(p => (p === 0 ? images.length - 1 : p - 1));
+  const goNext = () => setActiveImageIndex(p => (p === images.length - 1 ? 0 : p + 1));
+
+  // Touch swipe on hero
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      diff > 0 ? goNext() : goPrev();
+    }
+    touchStartX.current = null;
+  };
+
+  // Colour thumbnail click: only jump to image — does NOT set selected colour for ordering
+  const handleThumbClick = (color) => {
+    const idx = colorImages[color];
+    if (idx !== undefined) goTo(idx);
+  };
 
   const handleAddToCart = () => {
     addItem(
@@ -47,10 +107,11 @@ export default function ProductDetailClient({ product, relatedProducts }) {
     );
   };
 
+  const imageIndices = hasImages ? images.map((_, i) => i) : [0, 1, 2];
+
   const renderGalleryImage = (index) => {
     const src = images[index];
     const isLoaded = loadedImages.has(index);
-
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <div style={{
@@ -60,14 +121,10 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           flexDirection: 'column', gap: '12px',
           opacity: isLoaded ? 0 : 1, transition: 'opacity 0.3s ease',
         }}>
-          <div style={{
-            width: '80px', height: '80px', borderRadius: '50%',
-            background: getPlaceholderGradient(product.id, index + 10), opacity: 0.5,
-          }} />
-          <span style={{
-            fontFamily: 'var(--font-body)', fontSize: '0.75rem',
-            color: 'rgba(0,0,0,0.3)', letterSpacing: '0.15em', textTransform: 'uppercase',
-          }}>{product.subcategory}</span>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: getPlaceholderGradient(product.id, index + 10), opacity: 0.5 }} />
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.75rem', color: 'rgba(0,0,0,0.3)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+            {product.subcategory}
+          </span>
         </div>
         {src && (
           <Image
@@ -75,11 +132,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             alt={`${product.name} - View ${index + 1}`}
             fill
             sizes="(max-width: 768px) 100vw, 60vw"
-            style={{
-              objectFit: 'cover',
-              opacity: isLoaded ? 1 : 0,
-              transition: 'opacity 0.3s ease',
-            }}
+            style={{ objectFit: 'cover', opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
             onLoad={() => handleImageLoad(index)}
             onError={() => handleImageError(index)}
             draggable={false}
@@ -88,82 +141,100 @@ export default function ProductDetailClient({ product, relatedProducts }) {
       </div>
     );
   };
-
-  const renderThumb = (index) => {
-    const src = images[index];
-    const isLoaded = loadedImages.has(index);
-
-    return (
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: getPlaceholderGradient(product.id, index),
-          opacity: isLoaded ? 0 : 1, transition: 'opacity 0.3s ease',
-        }} />
-        {src && (
-          <Image
-            src={src}
-            alt={`${product.name} thumb ${index + 1}`}
-            fill
-            sizes="80px"
-            style={{
-              objectFit: 'cover',
-              opacity: isLoaded ? 1 : 0,
-              transition: 'opacity 0.3s ease',
-            }}
-            onLoad={() => handleImageLoad(index)}
-            onError={() => handleImageError(index)}
-            draggable={false}
-          />
-        )}
-      </div>
-    );
-  };
-
-  const imageIndices = hasImages ? images.map((_, i) => i) : [0, 1, 2];
 
   return (
     <>
       <section className="product-detail" id="product-detail">
         <div className="container">
           {/* Breadcrumb */}
-          <div style={{
-            marginBottom: '24px', fontSize: '0.8rem',
-            color: 'var(--color-gray-300)', fontFamily: 'var(--font-body)',
-          }}>
+          <div style={{ marginBottom: '24px', fontSize: '0.8rem', color: 'var(--color-gray-300)', fontFamily: 'var(--font-body)' }}>
             <Link href="/" style={{ color: 'inherit' }}>Home</Link>
             {' / '}
-            <Link href={`/${product.category}`} style={{ color: 'inherit', textTransform: 'capitalize' }}>
-              {product.category}
-            </Link>
+            <Link href={`/${product.category}`} style={{ color: 'inherit', textTransform: 'capitalize' }}>{product.category}</Link>
             {' / '}
             <span style={{ color: 'var(--color-charcoal)' }}>{product.name}</span>
           </div>
 
           <div className="product-detail-grid">
-            {/* Gallery */}
+            {/* ── Gallery column ─────────────────────────────────────────── */}
             <div className="product-gallery">
-              <div className="product-gallery-main">
+              {/* Hero image */}
+              <div
+                className="product-gallery-main"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                style={{ position: 'relative', overflow: 'hidden' }}
+              >
                 {imageIndices.map(i => (
                   <div key={i} className={`product-gallery-layer ${i === activeImageIndex ? 'active' : ''}`}>
                     {renderGalleryImage(i)}
                   </div>
                 ))}
+
+                {/* Arrows */}
+                {images.length > 1 && (
+                  <>
+                    <button className="pd-arrow pd-arrow--left" onClick={goPrev} aria-label="Previous image">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button className="pd-arrow pd-arrow--right" onClick={goNext} aria-label="Next image">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </>
+                )}
               </div>
-              <div className="product-gallery-thumbs">
-                {imageIndices.map(i => (
-                  <div key={i}
-                    className={`product-gallery-thumb ${i === activeImageIndex ? 'active' : ''}`}
-                    onClick={() => setActiveImageIndex(i)}
-                    onMouseEnter={() => setActiveImageIndex(i)}
-                  >
-                    {renderThumb(i)}
+
+              {/* Dot navigation */}
+              {images.length > 1 && (
+                <div className="pd-dots">
+                  {imageIndices.map(i => (
+                    <button
+                      key={i}
+                      className={`pd-dot ${i === activeImageIndex ? 'active' : ''}`}
+                      onClick={() => goTo(i)}
+                      aria-label={`Image ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Colour image thumbnail row — for image browsing only, does NOT select colour for order */}
+              {colorEntries.length > 0 && (
+                <div className="pd-color-thumbs">
+                  <div className="pd-color-label">BROWSE BY COLOUR</div>
+                  <div className="pd-color-thumb-row">
+                    {colorEntries.map(({ color, idx }) => {
+                      const isActive = activeImageIndex === idx;
+                      const src = images[idx];
+                      return (
+                        <button
+                          key={color}
+                          className={`pd-color-thumb-btn ${isActive ? 'active' : ''}`}
+                          onClick={() => handleThumbClick(color)}
+                          title={`View ${color} image`}
+                        >
+                          <div className="pd-color-thumb-img">
+                            {src && (
+                              <Image
+                                src={src}
+                                alt={color}
+                                fill
+                                sizes="72px"
+                                style={{ objectFit: 'cover' }}
+                                draggable={false}
+                              />
+                            )}
+                          </div>
+                          <span className="pd-color-thumb-label">{shortName(color)}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
 
-            {/* Info */}
+            {/* ── Info column ────────────────────────────────────────────── */}
             <div className="product-info">
               {product.badge && (
                 <span style={{
@@ -179,18 +250,12 @@ export default function ProductDetailClient({ product, relatedProducts }) {
               <div className="product-info-price">
                 ₹{product.price.toLocaleString()}
                 {product.originalPrice && (
-                  <span style={{
-                    color: 'var(--color-gray-300)', textDecoration: 'line-through',
-                    fontSize: '1.1rem', marginLeft: '12px',
-                  }}>
+                  <span style={{ color: 'var(--color-gray-300)', textDecoration: 'line-through', fontSize: '1.1rem', marginLeft: '12px' }}>
                     ₹{product.originalPrice.toLocaleString()}
                   </span>
                 )}
                 {product.originalPrice && (
-                  <span style={{
-                    color: '#27AE60', fontSize: '0.9rem', marginLeft: '12px',
-                    fontFamily: 'var(--font-body)',
-                  }}>
+                  <span style={{ color: '#27AE60', fontSize: '0.9rem', marginLeft: '12px', fontFamily: 'var(--font-body)' }}>
                     {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
                   </span>
                 )}
@@ -214,25 +279,24 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                 </div>
               )}
 
-              {/* Colors */}
-              {product.colors && product.colors.length > 0 && (
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{
-                    display: 'block', fontFamily: 'var(--font-heading)',
-                    fontSize: '0.85rem', letterSpacing: '0.15em', marginBottom: '8px',
-                  }}>COLOR</label>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {product.colors.map(color => (
-                      <button key={color} onClick={() => setSelectedColor(color)}
-                        style={{
-                          padding: '8px 16px',
-                          border: selectedColor === color ? '2px solid var(--color-crimson)' : '1px solid var(--color-gray-200)',
-                          background: selectedColor === color ? 'rgba(196,18,48,0.05)' : 'transparent',
-                          fontFamily: 'var(--font-body)', fontSize: '0.8rem',
-                          cursor: 'pointer', transition: 'all 0.2s',
-                        }}
+              {/* Colour selector — customer must explicitly pick a colour for the order */}
+              {colors.length > 0 && (
+                <div className="product-sizes" style={{ marginTop: '0' }}>
+                  <label>SELECT COLOUR{selectedColor ? <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, marginLeft: '8px', color: 'var(--color-charcoal)', fontSize: '0.8rem' }}>— {selectedColor}</span> : null}</label>
+                  <div className="size-options pd-color-swatch-row">
+                    {colors.map(color => (
+                      <button
+                        key={color}
+                        className={`pd-color-swatch ${selectedColor === color ? 'selected' : ''}`}
+                        onClick={() => setSelectedColor(color)}
+                        title={color}
+                        aria-label={`Select colour ${color}`}
                       >
-                        {color}
+                        <span
+                          className="pd-color-swatch-dot"
+                          style={{ background: getColorCss(color) }}
+                        />
+                        <span className="pd-color-swatch-name">{color}</span>
                       </button>
                     ))}
                   </div>
@@ -245,7 +309,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
               </button>
 
               <a
-                href={`https://wa.me/918074548419?text=Hi! I'm interested in ${product.name} (₹${product.price.toLocaleString()})`}
+                href={`https://wa.me/918074548419?text=Hi! I'm interested in ${product.name} (₹${product.price.toLocaleString()})${selectedColor ? ` in ${selectedColor}` : ''}${selectedSize ? `, Size ${selectedSize}` : ''}`}
                 target="_blank" rel="noopener noreferrer"
                 className="btn-magnetic btn-magnetic--dark"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}

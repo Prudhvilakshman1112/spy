@@ -224,6 +224,104 @@ d:\Brand2Brand\
 
 ---
 
+## Colour Variant System (`colorImages`)
+
+> **This is a major feature** — all new products should be added with colour-image tagging via the Admin Panel.
+
+### Concept
+
+Each product can have **multiple colour variants** (e.g. a shirt in Black, Navy, White). The storefront displays:
+
+1. A **large hero image carousel** with **dot navigation + ← → arrows** at the top.
+2. **Colour swatch chips** below the carousel — coloured circles with the colour name. Clicking one **jumps** the carousel to the image specifically tagged for that colour.
+3. Image `display_order = 0` is always the **cover photo** — the all-colours / best-angle shot shown by default.
+4. All other images are tagged with a specific colour via `color_tag`.
+
+### Database Column
+
+```
+product_images table
+├── id              (uuid, PK)
+├── product_id      (FK → products)
+├── image_url       (text)
+├── display_order   (integer) — 0 = cover, 1, 2, 3... = colour variants
+└── color_tag       (text, nullable) — exact colour name matching colors[] array
+                                       e.g. "Black", "Navy", "White/Blue"
+```
+
+> **IMPORTANT for Admin Panel agent:** The `color_tag` column must exist in the `product_images` table in Supabase. If it does not exist, run this migration:
+> ```sql
+> ALTER TABLE product_images ADD COLUMN IF NOT EXISTS color_tag TEXT DEFAULT NULL;
+> ```
+
+### Data Shape (storefront)
+
+The `shapeProduct()` function in `src/lib/queries.js` builds a `colorImages` map:
+
+```js
+// Product object shape:
+{
+  id: 'shirt-001',
+  colors: ['Black', 'Navy'],         // plain array of colour names
+  images: ['/url/cover.jpg', '/url/black.jpg', '/url/navy.jpg'],
+  colorImages: {
+    'Black': 1,   // images[1] = the Black variant
+    'Navy':  2,   // images[2] = the Navy variant
+  }
+}
+```
+
+- `colorImages[colorName]` is an **integer index** into the `images[]` array.
+- A colour with no tagged image will not appear in `colorImages` (the swatch will still show but won't navigate).
+- If `colorImages` is empty `{}`, swatches are shown but none trigger navigation.
+
+### Admin Workflow (how to add a new product with colour variants)
+
+1. Go to **Admin Panel → Products → New Product**
+2. Fill in Name, Price, Category, Subcategory, etc.
+3. Add colours in the **Colors** field (e.g. type "Black" → Enter, "Navy" → Enter)
+4. Upload images:
+   - **Image 1 (first uploaded)** = Cover photo — shown by default. Labelled "🖼 Cover" in the UI.
+   - **Image 2+** = Colour variant photos. A **"Tag Colour"** dropdown appears on each image — select which colour this photo represents.
+5. Save the product. The `color_tag` is saved on each `product_images` row.
+6. The storefront automatically reads `color_tag` and builds the `colorImages` map.
+
+### Admin Edit Workflow
+
+The same colour-tagging UI should also appear on the **Edit Product** page (`/products/[id]/edit`). When loading existing images, fetch `color_tag` alongside `image_url` and `display_order`. Allow re-tagging images via the same dropdown.
+
+### Static Data Fallback (`src/data/products.js`)
+
+For products defined in the static fallback file (before Supabase data exists), `colorImages` is declared directly:
+
+```js
+{
+  id: 'shirt-001',
+  images: ['/img/cover.jpg', '/img/black.jpg', '/img/navy.jpg'],
+  colorImages: {
+    'Black': 1,
+    'Navy':  2,
+  }
+}
+```
+
+This is the **same shape** produced by `shapeProduct()` — components work identically with both sources.
+
+### Colour CSS Lookup
+
+The storefront uses a built-in colour name → CSS value table in `ProductCard.js` and `ProductDetailClient.js` to render the swatch circles. If a new colour is added that doesn't appear in this table, the swatch circle will be grey. The table is in the `COLOR_CSS` constant at the top of each file. Add new entries as needed:
+
+```js
+const COLOR_CSS = {
+  'black':       '#1A1A1A',
+  'navy':        '#1B3A6B',
+  'mint':        '#98D4C4',
+  // add new colours here...
+};
+```
+
+---
+
 ## How Data Gets to the Storefront
 
 ### Server-Side Data Fetching (queries.js)

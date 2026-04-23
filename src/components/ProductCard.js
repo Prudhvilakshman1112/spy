@@ -5,10 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 
-/**
- * Generate a deterministic gradient placeholder for products without real images.
- * Uses the product id to create unique but consistent colors.
- */
+// Placeholder gradient for missing images
 function getPlaceholderGradient(id, index = 0) {
   const hash = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
   const hue1 = (hash + index * 47) % 360;
@@ -16,14 +13,12 @@ function getPlaceholderGradient(id, index = 0) {
   return `linear-gradient(${135 + index * 45}deg, hsl(${hue1}, 25%, 85%) 0%, hsl(${hue2}, 20%, 75%) 100%)`;
 }
 
-/**
- * Checks if an image path exists by attempting to load it.
- * Returns false for placeholder paths that don't exist yet.
- */
-function useImageExists(src) {
-  // For SSR safety, assume images exist. The browser will show the
-  // fallback gradient if they fail to load via the onError handler.
-  return true;
+// Short label for colour name (truncate to ~7 chars for small thumb label)
+function shortName(name) {
+  if (name.length <= 8) return name;
+  // Split on / and take first part
+  const first = name.split('/')[0].trim();
+  return first.length <= 8 ? first : first.slice(0, 7) + '…';
 }
 
 export default function ProductCard({ product }) {
@@ -32,52 +27,71 @@ export default function ProductCard({ product }) {
   const [isHovering, setIsHovering] = useState(false);
   const [failedImages, setFailedImages] = useState(new Set());
   const cardRef = useRef(null);
+  const touchStartX = useRef(null);
 
   const images = product.images || [];
+  const colorImages = product.colorImages || {};   // { 'Black': 1, 'Navy': 2 }
   const hasMultipleImages = images.length > 1;
+  const colors = product.colors || [];
 
+  // Only colours that have a mapped image index are shown as thumbnails
+  const colorEntries = colors
+    .map(c => ({ color: c, idx: colorImages[c] }))
+    .filter(e => e.idx !== undefined && images[e.idx]);
+
+  // ── Navigation ───────────────────────────────────────────────────────────
+  const goTo = useCallback((idx) => {
+    setActiveIndex(Math.max(0, Math.min(idx, images.length - 1)));
+  }, [images.length]);
+
+  const goPrev = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation();
+    setActiveIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+  }, [images.length]);
+
+  const goNext = useCallback((e) => {
+    e.preventDefault(); e.stopPropagation();
+    setActiveIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  }, [images.length]);
+
+  // ── Touch swipe ──────────────────────────────────────────────────────────
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      diff > 0
+        ? setActiveIndex(prev => (prev === images.length - 1 ? 0 : prev + 1))
+        : setActiveIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+    }
+    touchStartX.current = null;
+  };
+
+  // ── Colour thumb click ───────────────────────────────────────────────────
+  const handleColorThumbClick = useCallback((e, idx) => {
+    e.preventDefault(); e.stopPropagation();
+    goTo(idx);
+  }, [goTo]);
+
+  // ── Quick add ────────────────────────────────────────────────────────────
   const handleQuickAdd = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     addItem(product, product.sizes?.[0] || 'One Size', product.colors?.[0] || '');
   };
 
-  const handleThumbHover = useCallback((index) => {
-    setActiveIndex(index);
-  }, []);
-
-  const handleCardEnter = useCallback(() => {
-    setIsHovering(true);
-    // If there's a second image, auto-switch to it on card hover
-    if (hasMultipleImages && activeIndex === 0) {
-      setActiveIndex(1);
-    }
-  }, [hasMultipleImages, activeIndex]);
-
-  const handleCardLeave = useCallback(() => {
-    setIsHovering(false);
-    setActiveIndex(0);
-  }, []);
-
   const handleImageError = useCallback((index) => {
-    setFailedImages(prev => {
-      const next = new Set(prev);
-      next.add(index);
-      return next;
-    });
+    setFailedImages(prev => { const n = new Set(prev); n.add(index); return n; });
   }, []);
 
-  // Determine what to show for each image slot
-  const renderImage = (index, className) => {
+  // ── Image renderer ───────────────────────────────────────────────────────
+  const renderImage = (index) => {
     const src = images[index];
     const hasFailed = failedImages.has(index);
-
     if (src && !hasFailed) {
       return (
         <Image
           src={src}
           alt={`${product.name} - View ${index + 1}`}
-          className={className}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           style={{ objectFit: 'cover' }}
@@ -86,78 +100,38 @@ export default function ProductCard({ product }) {
         />
       );
     }
-
-    // Fallback: gradient placeholder
     return (
-      <div
-        className={className}
-        style={{
-          width: '100%',
-          height: '100%',
-          background: getPlaceholderGradient(product.id, index),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: '8px',
-        }}
-      >
-        {index === 0 && (
-          <>
-            <div style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              background: getPlaceholderGradient(product.id, index + 10),
-              opacity: 0.6,
-            }} />
-            <span style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.7rem',
-              color: 'rgba(0,0,0,0.4)',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-            }}>{product.subcategory}</span>
-          </>
-        )}
-        {index > 0 && (
-          <span style={{
-            fontFamily: 'var(--font-subheading)',
-            fontSize: '0.75rem',
-            color: 'rgba(0,0,0,0.35)',
-            fontStyle: 'italic',
-          }}>View {index + 1}</span>
-        )}
+      <div style={{
+        width: '100%', height: '100%',
+        background: getPlaceholderGradient(product.id, index),
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.65rem', color: 'rgba(0,0,0,0.4)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          {product.subcategory}
+        </span>
       </div>
     );
   };
 
-  // Render thumbnail for the strip
-  const renderThumb = (index) => {
-    const src = images[index];
-    const hasFailed = failedImages.has(index);
-
+  // ── Colour thumbnail renderer ────────────────────────────────────────────
+  const renderColorThumb = (imgIndex, colorName) => {
+    const src = images[imgIndex];
+    const hasFailed = failedImages.has(imgIndex);
     if (src && !hasFailed) {
       return (
         <Image
           src={src}
-          alt={`${product.name} thumb ${index + 1}`}
+          alt={colorName}
           fill
-          sizes="48px"
+          sizes="60px"
           style={{ objectFit: 'cover' }}
-          onError={() => handleImageError(index)}
+          onError={() => handleImageError(imgIndex)}
           draggable={false}
         />
       );
     }
-
     return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        background: getPlaceholderGradient(product.id, index),
-      }} />
+      <div style={{ width: '100%', height: '100%', background: getPlaceholderGradient(product.id, imgIndex) }} />
     );
   };
 
@@ -167,59 +141,62 @@ export default function ProductCard({ product }) {
       className="product-card"
       id={`product-${product.id}`}
       ref={cardRef}
-      onMouseEnter={handleCardEnter}
-      onMouseLeave={handleCardLeave}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="product-card-image">
+      {/* ── Main carousel image ─────────────────────────────────────────── */}
+      <div
+        className="product-card-image"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {product.badge && <span className="product-card-badge">{product.badge}</span>}
 
-        {/* Stacked images — all rendered, only active one is visible */}
+        {/* Stacked image layers */}
         <div className="product-card-image-stack">
           {images.length > 0 ? (
             images.map((_, i) => (
-              <div
-                key={i}
-                className={`product-card-layer ${i === activeIndex ? 'active' : ''}`}
-              >
-                {renderImage(i, 'product-card-layer-img')}
+              <div key={i} className={`product-card-layer ${i === activeIndex ? 'active' : ''}`}>
+                {renderImage(i)}
               </div>
             ))
           ) : (
-            /* No images at all — single placeholder */
-            <div className="product-card-layer active">
-              {renderImage(0, 'product-card-layer-img')}
-            </div>
+            <div className="product-card-layer active">{renderImage(0)}</div>
           )}
         </div>
 
-        <button
-          className="product-card-quick-add"
-          onClick={handleQuickAdd}
-        >
+        {/* ← → arrows on hover */}
+        {hasMultipleImages && isHovering && (
+          <>
+            <button className="pc-arrow pc-arrow--left" onClick={goPrev} aria-label="Previous image">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button className="pc-arrow pc-arrow--right" onClick={goNext} aria-label="Next image">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </>
+        )}
+
+        {/* Dots — only shown when no colour thumbs to avoid double navigation */}
+        {hasMultipleImages && colorEntries.length === 0 && (
+          <div className="pc-dots">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                className={`pc-dot ${i === activeIndex ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                aria-label={`Image ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        <button className="product-card-quick-add" onClick={handleQuickAdd}>
           Quick Add
         </button>
       </div>
 
-      {/* Thumbnail strip */}
-      {hasMultipleImages && (
-        <div className="product-card-thumbs">
-          {images.map((_, i) => (
-            <div
-              key={i}
-              className={`product-card-thumb ${i === activeIndex ? 'active' : ''}`}
-              onMouseEnter={() => handleThumbHover(i)}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setActiveIndex(i);
-              }}
-            >
-              {renderThumb(i)}
-            </div>
-          ))}
-        </div>
-      )}
-
+      {/* ── Product info ─────────────────────────────────────────────────── */}
       <div className="product-card-info">
         <div className="product-card-brand">{product.brand}</div>
         <div className="product-card-name">{product.name}</div>
@@ -230,6 +207,29 @@ export default function ProductCard({ product }) {
           )}
         </div>
       </div>
+
+      {/* ── Colour image thumbnails ──────────────────────────────────────── */}
+      {colorEntries.length > 0 && (
+        <div className="pc-color-thumbs">
+          {colorEntries.map(({ color, idx }) => {
+            const isActive = activeIndex === idx;
+            return (
+              <button
+                key={color}
+                className={`pc-color-thumb ${isActive ? 'active' : ''}`}
+                onClick={(e) => handleColorThumbClick(e, idx)}
+                title={color}
+                aria-label={`View ${color}`}
+              >
+                <div className="pc-color-thumb-img">
+                  {renderColorThumb(idx, color)}
+                </div>
+                <span className="pc-color-thumb-label">{shortName(color)}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </Link>
   );
 }

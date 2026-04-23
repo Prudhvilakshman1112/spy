@@ -92,7 +92,7 @@ export function buildWhatsAppMessage(itemBreakdown, totals) {
     const discount = item.rate > 0 ? ` → After ${Math.round(item.rate * 100)}% OFF: ₹${fmt(Math.round(item.discountedLineTotal))}` : '';
     lines.push(
       `${idx + 1}. *${item.name}*`,
-      `   ID: ${item.id} | Size: ${item.size || 'N/A'} | Colour: ${item.color || 'N/A'} | Qty: ${item.quantity}`,
+      `   Size: ${item.size || 'N/A'} | Colour: ${item.color || 'N/A'} | Qty: ${item.quantity}`,
       `   Price: ₹${fmt(item.price)} × ${item.quantity} = ₹${fmt(item.originalLineTotal)}${discount}`,
       '',
     );

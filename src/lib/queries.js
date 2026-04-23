@@ -5,9 +5,23 @@ import { createClient } from '@/lib/supabase/server';
  * flat object shape the existing components expect.
  */
 function shapeProduct(row) {
-  const images = (row.product_images || [])
-    .sort((a, b) => a.display_order - b.display_order)
-    .map((img) => img.image_url);
+  const sortedImages = (row.product_images || [])
+    .sort((a, b) => a.display_order - b.display_order);
+
+  const images = sortedImages.map((img) => img.image_url);
+
+  // Build colorImages: { 'Black': 1, 'Navy': 2, ... }
+  // Maps colour name -> index in the images[] array.
+  // Images with no color_tag are cover/generic photos (index 0 by default).
+  const colorImages = {};
+  sortedImages.forEach((img, idx) => {
+    if (img.color_tag) {
+      // If a colour appears multiple times, keep the first (lowest display_order)
+      if (colorImages[img.color_tag] === undefined) {
+        colorImages[img.color_tag] = idx;
+      }
+    }
+  });
 
   return {
     id: row.id,
@@ -24,6 +38,7 @@ function shapeProduct(row) {
     badge: row.badge,
     atmosphere: row.atmosphere_theme || 'default',
     images,
+    colorImages,  // { 'Black': 1, 'Navy': 2 } — colour → image index
   };
 }
 
@@ -31,7 +46,7 @@ const PRODUCT_SELECT = `
   id, name, brand, gender, price, original_price, description,
   sizes, colors, badge, atmosphere_theme, is_active, created_at,
   subcategories ( id, name, slug, categories ( id, name, slug ) ),
-  product_images ( id, image_url, display_order )
+  product_images ( id, image_url, display_order, color_tag )
 `;
 
 // ─── Query Functions ───
