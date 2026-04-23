@@ -7,6 +7,7 @@ import CartDrawer from '@/components/CartDrawer';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 import VizagIntro from '@/components/VizagIntro';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: "Brand Two Brand's | Premium Men's Fashion Store - Vizag",
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
             <Footer />
             <WhatsAppWidget />
             <SpeedInsights />
+            <Analytics />
           </AtmosphereProvider>
         </CartProvider>
       </body>
