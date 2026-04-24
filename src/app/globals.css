@@ -867,7 +867,8 @@ h5, h6 {
   right: 0;
   padding: var(--space-xl);
   color: var(--color-white);
-  transform: translateY(20px);
+  /* Always visible at bottom — no transform offset */
+  transform: translateY(0);
   transition: transform var(--transition-normal);
 }
 
@@ -1008,7 +1009,8 @@ h5, h6 {
   z-index: 5;
 }
 
-.product-card-quick-add {
+/* Desktop slide-up bar (renamed to --bar variant) */
+.product-card-quick-add--bar {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1031,12 +1033,48 @@ h5, h6 {
   z-index: 6;
 }
 
-.product-card:hover .product-card-quick-add {
+.product-card:hover .product-card-quick-add--bar {
   transform: translateY(0);
 }
 
-.product-card-quick-add:hover {
+.product-card-quick-add--bar:hover {
   background: var(--color-crimson);
+}
+
+/* ── Mobile persistent cart icon (bottom-right of card image) ── */
+.product-card-cart-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.88);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: var(--color-white);
+  display: none;            /* hidden on desktop — hover bar is enough */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 8;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+
+.product-card-cart-icon:hover,
+.product-card-cart-icon:active {
+  background: var(--color-crimson);
+  transform: scale(1.08);
+}
+
+/* Show icon on touch devices / mobile, hide slide-up bar */
+@media (max-width: 768px) {
+  .product-card-cart-icon {
+    display: flex;
+  }
+  .product-card-quick-add--bar {
+    display: none;
+  }
 }
 
 /* ── Carousel: dots ── */
@@ -1480,7 +1518,7 @@ h5, h6 {
   .pd-color-thumb-img { width: 54px; height: 66px; }
   .pd-color-thumb-label { font-size: 0.62rem; max-width: 54px; }
 
-  .product-card-quick-add {
+  .product-card-quick-add--bar {
     font-size: 0.65rem;
     padding: 8px;
   }
@@ -1571,10 +1609,16 @@ h5, h6 {
 }
 
 .brand-story-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3xl);
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-2xl);
+}
+
+.brand-story-content {
+  text-align: center;
+  max-width: 700px;
+  width: 100%;
 }
 
 .brand-story-content h2 {
@@ -1594,8 +1638,11 @@ h5, h6 {
 
 .brand-story-visual {
   position: relative;
-  aspect-ratio: 4/5;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 16/9;
   overflow: hidden;
+  align-self: center;
 }
 
 .brand-story-visual img {
@@ -1604,29 +1651,22 @@ h5, h6 {
   object-fit: cover;
 }
 
-.brand-story-visual::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--color-gold);
-  margin: 20px;
-  pointer-events: none;
-}
-
+/* No decorative border on the new landscape visual */
 @media (max-width: 768px) {
-  .brand-story-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
-  }
-  .brand-story-content h2 {
-    font-size: 1.3rem;
-  }
-  .brand-story-content p {
-    font-size: 0.8rem;
-    line-height: 1.6;
+  .brand-story {
+    padding: var(--space-2xl) 0;
   }
   .brand-story-visual {
-    aspect-ratio: 3/4;
+    max-width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 240px;
+  }
+  .brand-story-content h2 {
+    font-size: 1.5rem;
+  }
+  .brand-story-content p {
+    font-size: 0.85rem;
+    line-height: 1.6;
   }
 }
 
@@ -1641,10 +1681,45 @@ h5, h6 {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
-  gap: var(--space-2xl);
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--space-3xl);
   padding-bottom: var(--space-2xl);
   border-bottom: 1px solid var(--color-gray-600);
+  align-items: start;
+}
+
+/* Centred heading columns (Shop, Company, Visit Our Store) */
+.footer-col--center {
+  text-align: center;
+}
+
+.footer-col--center .footer-links--grid {
+  text-align: left;
+  display: inline-grid;  /* shrink to content so grid stays centred */
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--space-md);
+}
+
+/* Visit Our Store 2-col contact layout */
+.footer-store-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm) var(--space-md);
+  margin-top: 4px;
+}
+
+.footer-store-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-contact-item--block {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 0;
+  font-size: 0.8rem;
 }
 
 .footer-brand .header-logo {
@@ -1679,6 +1754,17 @@ h5, h6 {
 .footer-links a:hover {
   color: var(--color-crimson);
   padding-left: 8px;
+}
+
+/* ── Compact 2-col grid for Shop and Company links ── */
+.footer-links--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--space-md);
+}
+
+.footer-links--grid a {
+  padding: 5px 0;
 }
 
 .footer-contact-item {
@@ -1729,23 +1815,38 @@ h5, h6 {
 }
 
 @media (max-width: 768px) {
+  .footer {
+    padding: var(--space-2xl) 0 var(--space-lg);
+  }
   .footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+  .footer-brand p {
+    max-width: 100%;
   }
   .footer-heading {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    margin-bottom: var(--space-md);
+  }
+  .footer-col--center {
+    text-align: left;
+  }
+  .footer-store-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
   }
   .footer-links a,
   .footer-brand p,
-  .footer-contact-item {
-    font-size: 0.75rem;
+  .footer-contact-item,
+  .footer-contact-item--block {
+    font-size: 0.78rem;
   }
-}
-
-@media (max-width: 380px) {
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
+  .footer-bottom {
+    flex-direction: column;
+    gap: var(--space-md);
+    text-align: center;
+    padding-top: var(--space-lg);
   }
 }
 
@@ -2443,15 +2544,19 @@ h5, h6 {
 
 @media (max-width: 768px) {
   .watch-showcase {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl) 0;
+  }
+  .watch-showcase-image {
+    aspect-ratio: 4/3;
   }
   .watch-showcase-content h2 {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
   }
   .watch-showcase-content p {
-    font-size: 0.8rem;
-    line-height: 1.6;
+    font-size: 0.85rem;
+    line-height: 1.7;
   }
 }
 
@@ -2518,13 +2623,34 @@ h5, h6 {
   filter: grayscale(0) contrast(1);
 }
 
+/* Address | Phone side-by-side on mobile, stacked on desktop */
+.contact-store-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
 @media (max-width: 768px) {
-  .contact-grid {
+  .contact-store-row {
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-md);
+    align-items: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-section {
+    padding: var(--space-2xl) 0;
+  }
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+    margin-top: var(--space-xl);
   }
   .contact-map {
-    height: 250px;
+    height: 220px;
   }
 }
 
@@ -2690,22 +2816,48 @@ h5, h6 {
 }
 
 @media (max-width: 768px) {
+  .product-detail {
+    padding: var(--space-xl) 0;
+  }
   .product-detail-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  /* Image gallery sits at top full-width, then info flows below */
+  .product-gallery {
+    order: 1;
+  }
+  .product-info {
+    order: 2;
+    padding-top: var(--space-lg);
+  }
+  .product-gallery-main {
+    aspect-ratio: 3/4;
+    margin-bottom: 0;
   }
   .product-info h1 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+  }
+  .product-info-brand {
+    font-size: 0.7rem;
+    margin-bottom: var(--space-sm);
   }
   .product-info-price {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    margin-bottom: var(--space-md);
   }
   .product-info-desc {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    margin-bottom: var(--space-md);
   }
   .product-gallery-thumb {
-    width: 50px;
-    height: 60px;
+    width: 56px;
+    height: 70px;
+  }
+  /* Action buttons full width, prominent on mobile */
+  #add-to-cart-btn {
+    font-size: 0.9rem;
+    padding: 14px;
   }
 }
 

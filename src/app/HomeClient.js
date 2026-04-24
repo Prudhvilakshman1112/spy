@@ -158,9 +158,7 @@ export default function HomeClient({ featured, newArrivals }) {
               }} />
               <div className="atmosphere-card-overlay" />
               <div className="atmosphere-card-content">
-                <div className="atmosphere-card-label">Atmosphere A</div>
                 <h3 className="atmosphere-card-title">MEN&apos;S CLOTHING</h3>
-                <p className="atmosphere-card-desc">Shirts · Jeans · Hoodies · Kurthas</p>
               </div>
             </Link>
 
@@ -172,9 +170,7 @@ export default function HomeClient({ featured, newArrivals }) {
               }} />
               <div className="atmosphere-card-overlay" />
               <div className="atmosphere-card-content">
-                <div className="atmosphere-card-label">Atmosphere B</div>
                 <h3 className="atmosphere-card-title">FOOTWEAR HUB</h3>
-                <p className="atmosphere-card-desc">Men &amp; Women · Shoes · Slides · Sports</p>
               </div>
             </Link>
 
@@ -186,9 +182,7 @@ export default function HomeClient({ featured, newArrivals }) {
               }} />
               <div className="atmosphere-card-overlay" />
               <div className="atmosphere-card-content">
-                <div className="atmosphere-card-label">Atmosphere C</div>
                 <h3 className="atmosphere-card-title">ACCESSORIES</h3>
-                <p className="atmosphere-card-desc">Luxury Watches · Premium Bags · Essentials</p>
               </div>
             </Link>
           </div>
@@ -201,7 +195,7 @@ export default function HomeClient({ featured, newArrivals }) {
           <h2 className="section-title" style={{ color: '#fff' }}>TRENDING NOW</h2>
           <div className="products-grid">
             {featured.map(product => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} hideColorThumbs />
             ))}
           </div>
         </div>
@@ -213,7 +207,7 @@ export default function HomeClient({ featured, newArrivals }) {
           <h2 className="section-title">NEW ARRIVALS</h2>
           <div className="products-grid">
             {newArrivals.map(product => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} hideColorThumbs />
             ))}
           </div>
         </div>
@@ -223,6 +217,17 @@ export default function HomeClient({ featured, newArrivals }) {
       <section className="brand-story" id="brand-story">
         <div className="container">
           <div className="brand-story-grid">
+            {/* Visual FIRST on all screen sizes */}
+            <div className="brand-story-visual" style={{ position: 'relative' }}>
+              <Image
+                src="/images/brand_story_visual.png"
+                alt="Brand 2 Brand — Born in the City of Destiny, Visakhapatnam"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+            {/* Content below / on right */}
             <div className="brand-story-content">
               <h2>BORN IN THE <span className="accent-text">CITY OF DESTINY</span></h2>
               <p>
@@ -236,18 +241,16 @@ export default function HomeClient({ featured, newArrivals }) {
                 Whether it&apos;s the perfect floral shirt for a beach evening or a precision 
                 timepiece for a formal gathering, we bring the world&apos;s best to your doorstep.
               </p>
-              <Link href="/contact" className="btn-magnetic" style={{ marginTop: '24px' }}>
-                VISIT OUR STORE
-              </Link>
-            </div>
-            <div className="brand-story-visual" style={{ position: 'relative' }}>
-              <Image
-                src="/products/logo/B2blogo.jpg"
-                alt="Brand 2 Brand Logo"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                style={{ objectFit: 'cover' }}
-              />
+              <div style={{ textAlign: 'center', marginTop: '24px' }}>
+                <a
+                  href="https://www.google.com/maps/search/Brand+Two+Brand+Pedda+Waltair+Visakhapatnam"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-magnetic"
+                >
+                  VISIT OUR STORE
+                </a>
+              </div>
             </div>
           </div>
         </div>

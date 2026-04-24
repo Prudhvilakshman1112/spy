@@ -16,12 +16,11 @@ function getPlaceholderGradient(id, index = 0) {
 // Short label for colour name (truncate to ~7 chars for small thumb label)
 function shortName(name) {
   if (name.length <= 8) return name;
-  // Split on / and take first part
   const first = name.split('/')[0].trim();
   return first.length <= 8 ? first : first.slice(0, 7) + '…';
 }
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, hideColorThumbs = false }) {
   const { addItem } = useCart();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -30,7 +29,7 @@ export default function ProductCard({ product }) {
   const touchStartX = useRef(null);
 
   const images = product.images || [];
-  const colorImages = product.colorImages || {};   // { 'Black': 1, 'Navy': 2 }
+  const colorImages = product.colorImages || {};
   const hasMultipleImages = images.length > 1;
   const colors = product.colors || [];
 
@@ -165,7 +164,7 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* ← → arrows on hover */}
+        {/* ← → arrows on hover (desktop only) */}
         {hasMultipleImages && isHovering && (
           <>
             <button className="pc-arrow pc-arrow--left" onClick={goPrev} aria-label="Previous image">
@@ -177,7 +176,7 @@ export default function ProductCard({ product }) {
           </>
         )}
 
-        {/* Dots — only shown when no colour thumbs to avoid double navigation */}
+        {/* Dots — only shown when no colour thumbs */}
         {hasMultipleImages && colorEntries.length === 0 && (
           <div className="pc-dots">
             {images.map((_, i) => (
@@ -191,8 +190,22 @@ export default function ProductCard({ product }) {
           </div>
         )}
 
-        <button className="product-card-quick-add" onClick={handleQuickAdd}>
+        {/* Desktop: slide-up Quick Add bar on hover */}
+        <button className="product-card-quick-add product-card-quick-add--bar" onClick={handleQuickAdd}>
           Quick Add
+        </button>
+
+        {/* Mobile: persistent small cart icon (always visible, bottom-right) */}
+        <button
+          className="product-card-cart-icon"
+          onClick={handleQuickAdd}
+          aria-label="Add to bag"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
         </button>
       </div>
 
@@ -208,8 +221,8 @@ export default function ProductCard({ product }) {
         </div>
       </div>
 
-      {/* ── Colour image thumbnails ──────────────────────────────────────── */}
-      {colorEntries.length > 0 && (
+      {/* ── Colour image thumbnails (hidden on home page) ─────────────────── */}
+      {!hideColorThumbs && colorEntries.length > 0 && (
         <div className="pc-color-thumbs">
           {colorEntries.map(({ color, idx }) => {
             const isActive = activeIndex === idx;

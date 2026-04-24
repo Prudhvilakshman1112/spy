@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import { useAtmosphere } from '@/context/AtmosphereContext';
 
@@ -19,9 +20,16 @@ export default function ClothingClient({ allProducts, tabs }) {
   return (
     <>
       <section className="category-hero" id="clothing-hero">
-        <div className="category-hero-bg" style={{
-          background: 'linear-gradient(135deg, #1A1A1A 0%, #2C3E50 50%, #C41230 100%)',
-        }} />
+        <div className="category-hero-bg" style={{ background: '#1A1A1A' }}>
+          <Image
+            src="/images/clothing_hero.png"
+            alt="Men's Clothing Collection at Brand2Brand Vizag"
+            fill
+            priority
+            sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center top', opacity: 0.55 }}
+          />
+        </div>
         <div className="category-hero-content">
           <h1>MEN&apos;S CLOTHING</h1>
           <p>Urban sophistication meets timeless style</p>
