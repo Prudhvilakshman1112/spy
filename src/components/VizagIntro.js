@@ -237,6 +237,12 @@ export default function VizagIntro() {
     if (typeof window === 'undefined') return;
     if (sessionStorage.getItem('vizag-intro-done')) return;
 
+    // Respect OS accessibility setting only
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sessionStorage.setItem('vizag-intro-done', '1');
+      return;
+    }
+
     // Set all intro data in one go on the client, asynchronously for Next 16 lint
     const timer = setTimeout(() => {
       setIntroData({

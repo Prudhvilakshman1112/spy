@@ -47,6 +47,12 @@ export default function HomeClient({ featured, newArrivals }) {
   useEffect(() => {
     if (!heroRef.current) return;
 
+    // Respect OS accessibility setting only
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set('.hero-badge, .hero h1, .hero-subtitle, .hero-cta-group', { opacity: 1, y: 0 });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ delay: 0.3 });
 
