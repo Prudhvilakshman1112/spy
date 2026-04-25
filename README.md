@@ -15,10 +15,14 @@
 - [Routing & Pages](#routing--pages)
 - [Components](#components)
 - [State Management](#state-management)
+- [Discount System & WhatsApp Checkout](#discount-system--whatsapp-checkout)
 - [Atmosphere System](#atmosphere-system)
 - [Middleware](#middleware)
+- [SEO & Analytics](#seo--analytics)
+- [Custom 404 Page](#custom-404-page)
 - [Styling & Design System](#styling--design-system)
 - [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
 - [Getting Started](#getting-started)
 - [Relationship with Admin Panel](#relationship-with-admin-panel)
 
@@ -60,6 +64,8 @@ Both the storefront and admin panel connect to the **same Supabase project**. Th
 | **@supabase/ssr**| Server-side Supabase client for Next.js       |
 | **GSAP**         | GreenSock Animation Platform — hero animations, scroll effects |
 | **Vanilla CSS**  | Full design system — no Tailwind, pure CSS with custom properties |
+| **@vercel/analytics** | Vercel Web Analytics — page views, visitor metrics |
+| **@vercel/speed-insights** | Vercel Speed Insights — Core Web Vitals monitoring |
 
 ---
 
@@ -68,12 +74,12 @@ Both the storefront and admin panel connect to the **same Supabase project**. Th
 ```
 d:\Brand2Brand\
 ├── .env.local                 # Supabase connection keys
-├── next.config.mjs            # Next.js configuration
+├── next.config.mjs            # Next.js config (image remote patterns, allowed origins)
 ├── jsconfig.json              # Path aliases (@/ → src/)
 ├── package.json               # Dependencies & scripts
 │
 ├── public/                    # Static assets
-│   ├── images/                # Atmosphere backgrounds, hero images
+│   ├── images/                # Atmosphere backgrounds, hero images, brand story visual
 │   └── products/              # Local product images (legacy)
 │
 ├── src/
@@ -81,30 +87,34 @@ d:\Brand2Brand\
 │   │
 │   ├── lib/
 │   │   ├── queries.js         # ALL database query functions (server-side)
+│   │   ├── discounts.js       # Category discount engine + WhatsApp message builder
 │   │   └── supabase/
 │   │       ├── client.js      # Browser-side Supabase client
 │   │       └── server.js      # Server-side Supabase client (with cookies)
 │   │
 │   ├── context/
-│   │   ├── CartContext.js     # Shopping cart state management
+│   │   ├── CartContext.js     # Shopping cart + discount-aware totals
 │   │   └── AtmosphereContext.js # Theme switching (colors per category)
 │   │
 │   ├── components/
-│   │   ├── Header.js          # Navigation bar with cart button
-│   │   ├── Footer.js          # Footer with links & store info
-│   │   ├── ProductCard.js     # Product display card with image gallery
-│   │   ├── CartDrawer.js      # Slide-out shopping cart panel
+│   │   ├── Header.js          # Two-row nav: logo+cart row + mobile nav bar
+│   │   ├── Footer.js          # Footer with 2-col store info layout
+│   │   ├── ProductCard.js     # Product card with colour-thumb gallery + touch swipe
+│   │   ├── CartDrawer.js      # Cart with bill breakdown + WhatsApp checkout
 │   │   ├── VizagIntro.js      # Cinematic intro animation on first load
-│   │   └── WhatsAppWidget.js  # Floating WhatsApp contact button
+│   │   └── WhatsAppWidget.js  # Floating WhatsApp button (auto-hides when cart open)
 │   │
 │   ├── data/
 │   │   └── products.js        # Legacy static product data (fallback)
 │   │
 │   └── app/                   # Next.js App Router pages
-│       ├── layout.js          # Root layout — providers, header, footer
+│       ├── layout.js          # Root layout — providers, header, footer, analytics
 │       ├── page.js            # Homepage — server component
-│       ├── HomeClient.js      # Homepage — client component (animations)
-│       ├── globals.css        # ENTIRE design system (40KB+)
+│       ├── HomeClient.js      # Homepage — hero, discount banner, brand story
+│       ├── globals.css        # ENTIRE design system (64KB+)
+│       ├── sitemap.js         # Dynamic sitemap (static pages + all active products)
+│       ├── robots.js          # robots.txt generation
+│       ├── not-found.js       # Custom branded 404 page
 │       │
 │       ├── clothing/
 │       │   ├── page.js        # Clothing listing (server component)
@@ -121,10 +131,11 @@ d:\Brand2Brand\
 │       │
 │       ├── product/
 │       │   └── [id]/
-│       │       └── page.js    # Product detail page (dynamic route)
+│       │       ├── page.js            # Product detail (server) + dynamic SEO metadata
+│       │       └── ProductDetailClient.js  # Gallery, size/colour pickers, WhatsApp enquiry
 │       │
 │       └── contact/
-│           └── page.js        # Store location, map, contact info
+│           └── page.js        # Hero, feedback form, Google Maps, WhatsApp CTA
 ```
 
 ---
@@ -377,34 +388,82 @@ Pattern used throughout:
 page.js (Server) → fetches data → passes to XxxClient.js (Client) → renders UI
 ```
 
+### Homepage Sections (`HomeClient.js`)
+
+The homepage is composed of these sections in order:
+
+1. **Hero Section** — Full-viewport cinematic hero with GSAP-animated text (badge → h1 → subtitle → CTAs), floating particle dots, and scroll indicator
+2. **Discount Banner** — Auto-scrolling ticker showing all three category offers
+3. **Explore Our Worlds** — Three atmosphere cards (Clothing, Footwear, Accessories) linking to category pages, each with a background image + overlay
+4. **Trending Now** — Featured products grid (`badge = BESTSELLER` or `TRENDING`), colour thumbs hidden
+5. **New Arrivals** — New products grid (`badge = NEW` or `EXCLUSIVE`), colour thumbs hidden
+6. **Brand Story** — Two-column layout: full-width image on left/top + "Born in the City of Destiny" narrative with CTA to Google Maps
+
+### Product Detail Page (`/product/[id]`)
+
+**Server component** (`page.js`):
+- Fetches product via `getProductById(id)` + related products via `getRelatedProducts()`
+- Generates dynamic SEO metadata (title, description, og:image, twitter card)
+- Calls `notFound()` if product doesn't exist
+
+**Client component** (`ProductDetailClient.js`):
+- **Breadcrumb**: Home / Category / Product Name
+- **Image gallery**: Hero carousel with stacked layers, touch swipe, arrow navigation, dot indicators
+- **"Browse by Colour" thumbnails**: Clicking a colour thumb **only** jumps to that colour's image — it does **NOT** select the colour for ordering (decoupled)
+- **Size selector**: "SELECT SIZE" with button-style options
+- **Colour selector**: "SELECT COLOUR" with swatch circles (CSS colour dots from `COLOR_CSS` table) — this is what determines the colour sent to cart
+- **"ADD TO BAG" button**: Adds selected size + colour to cart
+- **"ENQUIRE ON WHATSAPP" button**: Opens WhatsApp with pre-filled message including product name, price, selected colour, and size
+- **"You May Also Like"** section: 4 related products from the same category
+
+> **Key design decision**: Image gallery browsing and colour selection for ordering are deliberately **decoupled**. A customer can browse colour images without accidentally selecting that colour for their order.
+
+### Contact Page (`/contact`)
+
+- **Hero section** with background image and "GET IN TOUCH" heading
+- **Feedback form**: Name, email, phone/WhatsApp, message fields (client-side submit with success animation)
+- **Store details**: Google Maps embed + address + phone + WhatsApp CTA button
+
 ---
 
 ## Components
 
 ### Header (`src/components/Header.js`)
-- Fixed navigation bar at top
-- Links: Clothing, Footwear, Accessories, Contact
-- Cart icon with item count badge
-- Scroll-aware background transparency
-- Mobile hamburger menu with slide-in overlay
-- Closes mobile menu on route change
+- **Two-row layout** on mobile:
+  - Row 1: Brand logo (left) + cart icon with count badge (right)
+  - Row 2: Horizontal nav links (Clothing, Footwear, Accessories, Contact)
+- Desktop: single row with logo, inline nav, and cart icon
+- Scroll-aware background (transparent → solid `rgba(13,13,13,0.98)` after 20px scroll)
+- Active link highlighting based on current pathname
 
 ### ProductCard (`src/components/ProductCard.js`)
-- Displays product image with hover-to-switch gallery
-- Thumbnail strip for multi-image products
-- Badge display (BESTSELLER, NEW, etc.)
-- Quick Add button (adds first size/color to cart)
-- Graceful fallback: gradient placeholder for missing images
+- Image carousel with **stacked layers** (CSS opacity transitions, not sliding)
+- **Touch swipe** support for mobile (40px threshold)
+- **← → arrow navigation** on desktop hover
+- **Colour image thumbnails** below the card — clicking jumps carousel to that colour's image
+  - Controlled by `hideColorThumbs` prop (hidden on homepage, shown on category pages)
+- **Dot navigation** shown only when no colour thumbs are available
+- Badge display (BESTSELLER, NEW, TRENDING, EXCLUSIVE)
+- **Two Quick Add UI modes**:
+  - Desktop: slide-up "Quick Add" bar on hover
+  - Mobile: persistent small cart icon (bottom-right corner, always visible)
+- Graceful fallback: deterministic gradient placeholder for missing/broken images
 - Links to `/product/[id]` detail page
 
 ### CartDrawer (`src/components/CartDrawer.js`)
-- Slide-out panel from right side
-- Shows cart items with name, size, color, price
+- Slide-out panel from right side with backdrop overlay
+- **Product images** shown per item (with category-coloured initials fallback)
+- Per-item display: name, size, colour, price
+- **Discount-aware pricing**: shows original price struck through + discounted price + "X% OFF" badge
+- Line total shown when quantity > 1 (with "save ₹X" annotation)
 - Quantity adjustment (+/−) per item
 - Remove item button
-- Subtotal calculation
-- Checkout button (placeholder)
-- Backdrop overlay when open
+- **Full bill breakdown footer**:
+  - Original Total
+  - Per-category savings (e.g. "Clothing (10% off): −₹X")
+  - "🎉 YOU SAVE" total savings highlight
+  - Final Total after all discounts
+- **WhatsApp checkout button** — sends the entire cart as a formatted message to the store owner
 
 ### VizagIntro (`src/components/VizagIntro.js`)
 - Cinematic intro animation on first site visit
@@ -413,22 +472,24 @@ page.js (Server) → fetches data → passes to XxxClient.js (Client) → render
 - Only plays once per session (sessionStorage check)
 
 ### Footer (`src/components/Footer.js`)
-- Store information, address, phone
-- Navigation links
-- Social media links
-- Copyright notice
+- **Brand column**: Logo + tagline
+- **"Visit Our Store" column** with 2-column contact grid:
+  - Left: Full address (Shivalayam St, Pedda Waltair JN, Vizag)
+  - Right: Phone (clickable `tel:` link), WhatsApp link, Instagram (`@brand2brands_official`)
+- Bottom bar: copyright + social icons (Instagram, WhatsApp)
 
 ### WhatsAppWidget (`src/components/WhatsAppWidget.js`)
 - Floating WhatsApp icon (bottom-right corner)
 - Links to WhatsApp with pre-filled message
 - Bounce animation on load
+- **Auto-hides when cart drawer is open** (to avoid obstructing the cart's own WhatsApp CTA)
 
 ---
 
 ## State Management
 
 ### CartContext (`src/context/CartContext.js`)
-Manages the shopping cart state across the entire app using React Context.
+Manages the shopping cart state across the entire app using React Context. Now integrated with the discount engine.
 
 **State:**
 - `items` — Array of cart items (product + size + color + quantity)
@@ -439,9 +500,13 @@ Manages the shopping cart state across the entire app using React Context.
 - `removeItem(cartId)` — Removes item by cartId
 - `updateQuantity(cartId, qty)` — Updates quantity, removes if ≤ 0
 
-**Computed:**
+**Computed (discount-aware):**
 - `totalItems` — Sum of all item quantities
-- `subtotal` — Sum of (price × quantity) for all items
+- `subtotal` / `originalTotal` — Sum of (price × quantity) before discounts
+- `savingsByCategory` — `{ clothing: N, footwear: N, accessories: N }`
+- `totalSavings` — Sum of all category savings
+- `finalTotal` — Original total minus all savings
+- `itemBreakdown` — Items enriched with `{ rate, originalLineTotal, discountedLineTotal, saving }`
 
 ### AtmosphereContext (`src/context/AtmosphereContext.js`)
 Manages the visual theme system that changes colors based on the current category page.
@@ -456,6 +521,89 @@ Manages the visual theme system that changes colors based on the current categor
 
 Theme changes are applied by setting CSS custom properties on `document.documentElement`:
 - `--atmosphere-bg`, `--atmosphere-text`, `--atmosphere-accent`, `--atmosphere-surface`, `--atmosphere-surface-hover`
+
+---
+
+## Discount System & WhatsApp Checkout
+
+### Category-Specific Discounts (`src/lib/discounts.js`)
+
+The storefront applies **automatic category-based discounts** to every item in the cart:
+
+| Category | Discount Rate | Label |
+|------------|---------------|----------|
+| Clothing | 10% | `10% OFF` |
+| Footwear | 20% | `20% OFF` |
+| Accessories | 30% | `30% OFF` |
+
+**Key functions:**
+
+| Function | Purpose |
+|----------|--------|
+| `getDiscountRate(category)` | Returns the decimal rate (0–1) for a category |
+| `applyDiscount(price, category)` | Returns discounted price for a single item |
+| `computeCartTotals(items)` | Full cart breakdown: originalTotal, savingsByCategory, totalSavings, finalTotal, itemBreakdown |
+| `buildWhatsAppMessage(itemBreakdown, totals)` | Generates the formatted WhatsApp order message |
+
+### How Discounts Flow Through the App
+
+```
+Customer adds item to cart
+          │
+          ▼
+CartContext.addItem() stores product with `category` field
+          │
+          ▼
+useMemo(() => computeCartTotals(items))
+  │
+  ├── For each item: rate = DISCOUNT_RATES[item.category]
+  ├── discountedLineTotal = price × qty × (1 − rate)
+  ├── saving = originalLineTotal − discountedLineTotal
+  └── Aggregate: savingsByCategory, totalSavings, finalTotal
+          │
+          ▼
+CartDrawer renders bill breakdown with per-category savings
+          │
+          ▼
+"Send Order on WhatsApp" button calls buildWhatsAppMessage()
+  │
+  ├── Lists each item: name, size, colour, qty, price, discount
+  ├── Per-category savings summary
+  ├── Original Total, Total Savings, FINAL TOTAL
+  └── Opens: wa.me/918074548419?text=<encoded message>
+```
+
+### WhatsApp Message Format
+
+When the customer clicks "Send Order on WhatsApp", a message like this is generated:
+
+```
+🛏️ *NEW ORDER — Brand 2 Brand*
+
+1. *Floral Beach Shirt*
+   Size: L | Colour: Navy | Qty: 2
+   Price: ₹1,299 × 2 = ₹2,598 → After 10% OFF: ₹2,338
+
+2. *Premium Sneakers*
+   Size: 9 | Colour: White | Qty: 1
+   Price: ₹3,999 × 1 = ₹3,999 → After 20% OFF: ₹3,199
+
+━━━━━━━━━━━━━━━━━━━━
+Clothing (10% off) saved: −₹260
+Footwear (20% off) saved: −₹800
+Original Total : ₹6,597
+Total Savings  : −₹1,060
+*FINAL TOTAL   : ₹5,537*
+━━━━━━━━━━━━━━━━━━━━
+Please confirm availability & shipping details. Thank you! 🙏
+```
+
+### Animated Discount Banner (Homepage)
+
+The homepage displays a **scrolling ticker banner** (`DiscountBanner` in `HomeClient.js`) below the hero section:
+- Horizontally auto-scrolling CSS animation
+- Shows all three offers: 🎽 CLOTHING 10% OFF ✦ 👟 FOOTWEAR 20% OFF ✦ 💎 ACCESSORIES 30% OFF
+- Fixed "OFFERS" label on the left
 
 ---
 
@@ -485,18 +633,72 @@ Next.js middleware that runs on every request (except static assets).
 
 ---
 
+## SEO & Analytics
+
+### Dynamic Metadata
+
+Every product page generates **unique SEO metadata** at build/request time via `generateMetadata()` in `src/app/product/[id]/page.js`:
+- `<title>`: "Product Name by Brand | Brand Two Brand's"
+- `<meta description>`: Product description or auto-generated from name, brand, price, category
+- `keywords`: Product name, brand, category, "Brand Two Brand", "Vizag fashion"
+- `og:image` and `twitter:image`: First product image (with `summary_large_image` card)
+
+The root layout (`layout.js`) sets site-wide metadata:
+- Title: "Brand Two Brand's | Premium Men's Fashion Store - Vizag"
+- OpenGraph type: `website`
+
+### Sitemap (`src/app/sitemap.js`)
+
+Dynamic sitemap generation at `/sitemap.xml`:
+- **Static pages**: `/`, `/clothing`, `/footwear`, `/accessories`, `/contact`, `/footwear/men`, `/footwear/women`
+- **Dynamic product pages**: Queries all active products from Supabase and generates `/product/[id]` entries
+- Priorities: Homepage (1.0) > Categories (0.9) > Gender pages (0.8) > Contact (0.7) > Products (0.6)
+- Graceful fallback: still returns static pages if database is unreachable
+
+### Robots (`src/app/robots.js`)
+
+- Allows all crawlers on `/`
+- Disallows `/api/` and `/_next/`
+- Points to sitemap at `https://brand2brands.vercel.app/sitemap.xml`
+
+### Vercel Analytics & Speed Insights
+
+Both are included in the root layout:
+- `<SpeedInsights />` from `@vercel/speed-insights/next` — monitors Core Web Vitals
+- `<Analytics />` from `@vercel/analytics/next` — tracks page views and visitors
+
+---
+
+## Custom 404 Page
+
+`src/app/not-found.js` — a fully branded 404 experience:
+
+- **Giant animated "404"** with gradient text and glow effects
+- Decorative divider line
+- Headline: "PAGE NOT FOUND"
+- Tagline: "The page you're looking for has wandered off the runway"
+- Two CTAs: "BACK TO HOME" + "EXPLORE CLOTHING"
+- Floating brand watermark in the background
+- Noise texture overlay for premium feel
+
+---
+
 ## Styling & Design System
 
-The entire design system lives in `src/app/globals.css` (40KB+). Key features:
+The entire design system lives in `src/app/globals.css` (64KB+). Key features:
 
 - **CSS Custom Properties** for theme switching (atmosphere system)
 - **No CSS framework** — pure vanilla CSS for maximum control
-- **Responsive design** with mobile breakpoints
+- **Responsive design** with mobile-first breakpoints
 - **GSAP animations** for hero section, product reveals
 - **Glassmorphism effects** on header and cards
 - **Hero particles** — floating animated dots on homepage
-- **Product card hover effects** — image swap, quick-add reveal
+- **Product card hover effects** — image swap, quick-add bar reveal
 - **Cart drawer transitions** — smooth slide-in/out
+- **Discount banner ticker** — infinite horizontal scroll animation
+- **404 page effects** — gradient text, glow pulse, noise overlay
+- **Contact page** — form styling, map embed, responsive 2-column store info
+- **Colour swatches** — circular dots with CSS background values from `COLOR_CSS` lookup
 
 ---
 
@@ -516,6 +718,32 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 | `NEXT_PUBLIC_SUPABASE_URL` | Public (browser) | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (browser) | Supabase anonymous key (read-only access) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Service role key (full access — never exposed to browser) |
+
+---
+
+## Deployment
+
+### Production URL
+
+**https://brand2brands.vercel.app**
+
+The storefront is deployed on **Vercel** with automatic deployments from the Git repository.
+
+### Next.js Configuration (`next.config.mjs`)
+
+```js
+const nextConfig = {
+  allowedDevOrigins: ['192.168.0.109'],   // LAN testing on mobile
+  images: {
+    remotePatterns: [
+      new URL('https://xpmudrchipnbmvlawsuw.supabase.co/**'),  // Supabase Storage
+    ],
+  },
+};
+```
+
+- `allowedDevOrigins`: Allows dev server access from local network (for testing on phone)
+- `images.remotePatterns`: Whitelists the Supabase Storage domain for Next.js `<Image>` optimization
 
 ---
 
