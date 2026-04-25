@@ -1,6 +1,8 @@
 import { getFootwearByGender, getSubcategories } from '@/lib/queries';
 import FootwearGenderClient from './FootwearGenderClient';
 
+export const revalidate = 1800; // Revalidate every 30 minutes
+
 export default async function FootwearGenderPage({ params }) {
   const { gender } = await params;
 

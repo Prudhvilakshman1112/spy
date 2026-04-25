@@ -1,13 +1,16 @@
 import './globals.css';
+import dynamic from 'next/dynamic';
 import { CartProvider } from '@/context/CartContext';
 import { AtmosphereProvider } from '@/context/AtmosphereContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import CartDrawer from '@/components/CartDrawer';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
-import VizagIntro from '@/components/VizagIntro';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+
+// Lazy-load heavy components — still SSR but code-split into separate chunks
+const CartDrawer = dynamic(() => import('@/components/CartDrawer'));
+const VizagIntro = dynamic(() => import('@/components/VizagIntro'));
 
 export const metadata = {
   title: "Brand Two Brand's | Premium Men's Fashion Store - Vizag",

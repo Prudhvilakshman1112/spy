@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import gsap from 'gsap';
+import gsap from 'gsap/dist/gsap';
 import ProductCard from '@/components/ProductCard';
 import { useAtmosphere } from '@/context/AtmosphereContext';
 

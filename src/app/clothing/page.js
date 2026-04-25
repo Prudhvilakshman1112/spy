@@ -1,6 +1,8 @@
 import { getProductsByCategory, getSubcategories } from '@/lib/queries';
 import ClothingClient from './ClothingClient';
 
+export const revalidate = 1800; // Revalidate every 30 minutes
+
 export default async function ClothingPage() {
   const [allProducts, subcategories] = await Promise.all([
     getProductsByCategory('clothing'),

@@ -3075,3 +3075,91 @@ h5, h6 {
     margin: 0 -4px;
   }
 }
+
+/* ============================================
+   LOADING SKELETONS
+   ============================================ */
+
+.page-loading {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.skeleton-card {
+  background: var(--atmosphere-surface);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton-image {
+  width: 100%;
+  aspect-ratio: 5 / 6;
+  background: linear-gradient(
+    90deg,
+    var(--atmosphere-surface) 0%,
+    var(--atmosphere-surface-hover) 50%,
+    var(--atmosphere-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-text {
+  height: 1rem;
+  background: linear-gradient(
+    90deg,
+    var(--atmosphere-surface) 0%,
+    var(--atmosphere-surface-hover) 50%,
+    var(--atmosphere-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+  width: 80%;
+  height: 1.2rem;
+}
+
+.skeleton-subtitle {
+  width: 60%;
+}
+
+.skeleton-price {
+  width: 40%;
+  height: 1.4rem;
+  margin-top: 1rem;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+/* ============================================
+   CSS Containment for Performance
+   ============================================ */
+
+.product-card {
+  contain: layout style paint;
+  content-visibility: auto;
+}
+
+.cart-drawer {
+  contain: layout style;
+}
