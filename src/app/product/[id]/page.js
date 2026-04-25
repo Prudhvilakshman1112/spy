@@ -1,6 +1,29 @@
 import { getProductById, getRelatedProducts } from '@/lib/queries';
+import { createClient as createBrowserClient } from '@supabase/supabase-js';
 import ProductDetailClient from './ProductDetailClient';
 import { notFound } from 'next/navigation';
+
+export const revalidate = 7200; // Revalidate every 2 hours
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
+  const { data: products } = await supabase
+    .from('products')
+    .select('id')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  return products?.map((product) => ({
+    id: product.id,
+  })) || [];
+}
+
 
 export async function generateMetadata({ params }) {
   const { id } = await params;

@@ -1,4 +1,22 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
+
+/**
+ * Optimize Supabase Storage image URLs with transformation parameters.
+ * @param {string} url - Original image URL
+ * @param {number} width - Desired width in pixels
+ * @returns {string} Optimized URL with query parameters
+ */
+function optimizeImageUrl(url, width = 800) {
+  if (!url?.includes('supabase.co')) return url;
+
+  const urlObj = new URL(url);
+  urlObj.searchParams.set('width', width.toString());
+  urlObj.searchParams.set('quality', '85');
+  urlObj.searchParams.set('format', 'webp');
+
+  return urlObj.toString();
+}
 
 /**
  * Shape a raw product row (with joined subcategories + images) into the
@@ -8,7 +26,7 @@ function shapeProduct(row) {
   const sortedImages = (row.product_images || [])
     .sort((a, b) => a.display_order - b.display_order);
 
-  const images = sortedImages.map((img) => img.image_url);
+  const images = sortedImages.map((img) => optimizeImageUrl(img.image_url, 800));
 
   // Build colorImages: { 'Black': 1, 'Navy': 2, ... }
   // Maps colour name -> index in the images[] array.
@@ -42,6 +60,7 @@ function shapeProduct(row) {
   };
 }
 
+/** Full select — used for product detail page (needs description). */
 const PRODUCT_SELECT = `
   id, name, brand, gender, price, original_price, description,
   sizes, colors, badge, atmosphere_theme, is_active, created_at,
@@ -49,13 +68,21 @@ const PRODUCT_SELECT = `
   product_images ( id, image_url, display_order, color_tag )
 `;
 
-// ─── Query Functions ───
+/** Listing select — excludes description for lighter payloads. */
+const LISTING_SELECT = `
+  id, name, brand, gender, price, original_price,
+  sizes, colors, badge, atmosphere_theme,
+  subcategories ( id, name, slug, categories ( id, name, slug ) ),
+  product_images ( id, image_url, display_order, color_tag )
+`;
 
-export async function getProductsByCategory(categorySlug) {
+// ─── Query Functions (wrapped with React cache for request dedup) ───
+
+export const getProductsByCategory = cache(async (categorySlug) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .eq('subcategories.categories.slug', categorySlug);
 
@@ -63,13 +90,13 @@ export async function getProductsByCategory(categorySlug) {
   return (data || [])
     .filter((p) => p.subcategories?.categories?.slug === categorySlug)
     .map(shapeProduct);
-}
+});
 
-export async function getProductsBySubcategory(categorySlug, subcategorySlug) {
+export const getProductsBySubcategory = cache(async (categorySlug, subcategorySlug) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true);
 
   return (data || [])
@@ -79,33 +106,33 @@ export async function getProductsBySubcategory(categorySlug, subcategorySlug) {
         p.subcategories?.slug === subcategorySlug
     )
     .map(shapeProduct);
-}
+});
 
-export async function getProductsByGender(gender) {
+export const getProductsByGender = cache(async (gender) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .eq('gender', gender);
 
   return (data || []).map(shapeProduct);
-}
+});
 
-export async function getFootwearByGender(gender) {
+export const getFootwearByGender = cache(async (gender) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .eq('gender', gender);
 
   return (data || [])
     .filter((p) => p.subcategories?.categories?.slug === 'footwear')
     .map(shapeProduct);
-}
+});
 
-export async function getProductById(id) {
+export const getProductById = cache(async (id) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
@@ -115,35 +142,35 @@ export async function getProductById(id) {
 
   if (!data) return null;
   return shapeProduct(data);
-}
+});
 
-export async function getFeaturedProducts() {
+export const getFeaturedProducts = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .in('badge', ['BESTSELLER', 'TRENDING']);
 
   return (data || []).map(shapeProduct);
-}
+});
 
-export async function getNewArrivals() {
+export const getNewArrivals = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .in('badge', ['NEW', 'EXCLUSIVE']);
 
   return (data || []).map(shapeProduct);
-}
+});
 
-export async function getRelatedProducts(productId, categorySlug, limit = 4) {
+export const getRelatedProducts = cache(async (productId, categorySlug, limit = 4) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true)
     .neq('id', productId)
     .limit(20);
@@ -152,9 +179,9 @@ export async function getRelatedProducts(productId, categorySlug, limit = 4) {
     .filter((p) => p.subcategories?.categories?.slug === categorySlug)
     .slice(0, limit)
     .map(shapeProduct);
-}
+});
 
-export async function getCategories() {
+export const getCategories = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('categories')
@@ -162,9 +189,9 @@ export async function getCategories() {
     .order('name');
 
   return data || [];
-}
+});
 
-export async function getSubcategories(categorySlug) {
+export const getSubcategories = cache(async (categorySlug) => {
   const supabase = await createClient();
   const { data: cat } = await supabase
     .from('categories')
@@ -181,13 +208,13 @@ export async function getSubcategories(categorySlug) {
     .order('name');
 
   return data || [];
-}
+});
 
-export async function getAccessoriesGrouped() {
+export const getAccessoriesGrouped = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(LISTING_SELECT)
     .eq('is_active', true);
 
   const accessories = (data || [])
@@ -199,4 +226,4 @@ export async function getAccessoriesGrouped() {
     womenWatches: accessories.filter(p => p.subcategory === 'watches' && p.gender === 'women'),
     bags: accessories.filter(p => p.subcategory === 'bags'),
   };
-}
+});
