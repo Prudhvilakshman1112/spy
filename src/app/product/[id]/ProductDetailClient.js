@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useState, useCallback, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
+import { generatePlaceholder } from '@/lib/imageUtils';
 
 // ── Colour name → CSS value lookup ──────────────────────────────────────────
 const COLOR_CSS = {
@@ -132,6 +133,9 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             alt={`${product.name} - View ${index + 1}`}
             fill
             sizes="(max-width: 768px) 100vw, 60vw"
+            quality={90}
+            placeholder="blur"
+            blurDataURL={generatePlaceholder(product.category)}
             style={{ objectFit: 'cover', opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
             onLoad={() => handleImageLoad(index)}
             onError={() => handleImageError(index)}

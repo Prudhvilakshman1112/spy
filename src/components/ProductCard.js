@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { generatePlaceholder } from '@/lib/imageUtils';
 
 // Placeholder gradient for missing images
 function getPlaceholderGradient(id, index = 0) {
@@ -93,6 +94,9 @@ export default function ProductCard({ product, hideColorThumbs = false }) {
           alt={`${product.name} - View ${index + 1}`}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          quality={85}
+          placeholder="blur"
+          blurDataURL={generatePlaceholder(product.category)}
           style={{ objectFit: 'cover' }}
           onError={() => handleImageError(index)}
           draggable={false}
