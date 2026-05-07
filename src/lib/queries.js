@@ -2,20 +2,34 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * Optimize Supabase Storage image URLs with transformation parameters.
+ * Optimize image URLs with transformation parameters.
+ * Handles both Cloudinary URLs (native transforms) and legacy Supabase URLs.
  * @param {string} url - Original image URL
  * @param {number} width - Desired width in pixels
- * @returns {string} Optimized URL with query parameters
+ * @returns {string} Optimized URL
  */
 function optimizeImageUrl(url, width = 800) {
-  if (!url?.includes('supabase.co')) return url;
+  if (!url) return url;
 
-  const urlObj = new URL(url);
-  urlObj.searchParams.set('width', width.toString());
-  urlObj.searchParams.set('quality', '85');
-  urlObj.searchParams.set('format', 'webp');
+  // Cloudinary URLs: insert transformation params into the URL path
+  // e.g. /upload/v123/ → /upload/c_limit,w_800,q_auto,f_auto/v123/
+  if (url.includes('res.cloudinary.com')) {
+    return url.replace(
+      '/upload/',
+      `/upload/c_limit,w_${width},q_auto,f_auto/`
+    );
+  }
 
-  return urlObj.toString();
+  // Legacy Supabase Storage URLs
+  if (url.includes('supabase.co')) {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('width', width.toString());
+    urlObj.searchParams.set('quality', '85');
+    urlObj.searchParams.set('format', 'webp');
+    return urlObj.toString();
+  }
+
+  return url;
 }
 
 /**

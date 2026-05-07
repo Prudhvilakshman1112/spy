@@ -43,14 +43,23 @@
                ▼                              ▼
         ┌─────────────────────────────────────────┐
         │          SUPABASE (Shared Backend)       │
-        │  ┌─────────┐  ┌──────────┐  ┌────────┐  │
-        │  │PostgreSQL│  │ Storage  │  │  Auth   │  │
-        │  │   (DB)   │  │ (Images) │  │(Login)  │  │
-        │  └─────────┘  └──────────┘  └────────┘  │
+        │  ┌─────────┐  ┌────────┐                │
+        │  │PostgreSQL│  │  Auth   │               │
+        │  │   (DB)   │  │(Login)  │               │
+        │  └─────────┘  └────────┘                │
+        └───────────────────┬─────────────────────┘
+                            │ image_url references
+                            ▼
+        ┌─────────────────────────────────────────┐
+        │         ☁️  CLOUDINARY (Image CDN)       │
+        │  25 GB free storage + auto WebP/AVIF    │
+        │  URL: res.cloudinary.com/dbj9ittfl/...  │
         └─────────────────────────────────────────┘
 ```
 
 Both the storefront and admin panel connect to the **same Supabase project**. The admin adds/edits/deletes products, and the storefront reads and displays them. They are **completely decoupled** — separate folders, separate `node_modules`, separate deployments.
+
+**Image storage** is handled by **Cloudinary** (25 GB free tier), not Supabase Storage. The admin uploads images to Cloudinary and stores the returned URLs in the Supabase `product_images` table. The storefront reads those URLs and displays them via Next.js `<Image>`.
 
 ---
 
@@ -60,7 +69,8 @@ Both the storefront and admin panel connect to the **same Supabase project**. Th
 |-----------------|-----------------------------------------------|
 | **Next.js 16**   | React framework — App Router, SSR, file-based routing |
 | **React 19**     | UI component library                          |
-| **Supabase**     | Backend-as-a-Service — PostgreSQL database, image storage, authentication |
+| **Supabase**     | Backend-as-a-Service — PostgreSQL database, authentication |
+| **Cloudinary**   | Image CDN — 25 GB free storage, auto WebP/AVIF, on-the-fly transforms |
 | **@supabase/ssr**| Server-side Supabase client for Next.js       |
 | **GSAP**         | GreenSock Animation Platform — hero animations, scroll effects |
 | **Vanilla CSS**  | Full design system — no Tailwind, pure CSS with custom properties |
@@ -73,7 +83,7 @@ Both the storefront and admin panel connect to the **same Supabase project**. Th
 
 ```
 d:\Brand2Brand\
-├── .env.local                 # Supabase connection keys
+├── .env.local                 # Supabase + Cloudinary keys
 ├── next.config.mjs            # Next.js config (image remote patterns, allowed origins)
 ├── jsconfig.json              # Path aliases (@/ → src/)
 ├── package.json               # Dependencies & scripts
@@ -153,19 +163,26 @@ d:\Brand2Brand\
 │  new product     │     │  │  table       │   │     │  calls query.js  │
 │  with images     │     │  └──────────────┘   │     │  function        │
 │                  │     │                     │     │                  │
-│  Images uploaded │────▶│  ┌──────────────┐   │     │  Images served   │
-│  to storage      │     │  │  Storage     │   │     │  via public URLs │
-│                  │     │  │  Bucket      │   │     │                  │
+│  Images uploaded │──┐  │  ┌──────────────┐   │     │  Images served   │
+│  to Cloudinary   │  │  │  │product_images│   │     │  from Cloudinary  │
+│                  │  └─▶│  │ (URLs only)  │   │     │  CDN via URLs    │
 └──────────────────┘     │  └──────────────┘   │     └──────────────────┘
                          └────────────────────┘
+                                  │
+                    ┌─────────────┘
+                    ▼
+         ┌─────────────────────┐
+         │  ☁️ CLOUDINARY CDN   │
+         │  (actual image files)│
+         └─────────────────────┘
 ```
 
 ### Step-by-step data lifecycle:
 
 1. **Admin creates a product** at `http://localhost:3001/products/new`
    - Fills in: name, brand, price, description, sizes, colors, category, subcategory, badge
-   - Uploads product images (stored in Supabase Storage bucket `product-images`)
-   - Product row inserted into `products` table, image URLs into `product_images` table
+   - Uploads product images → sent to **Cloudinary** → returns CDN URLs
+   - Product row inserted into `products` table, Cloudinary image URLs into `product_images` table
 
 2. **Storefront page loads** (e.g., `/clothing`)
    - Next.js **Server Component** executes `getProductsByCategory('clothing')` from `src/lib/queries.js`
@@ -184,7 +201,7 @@ d:\Brand2Brand\
      ```
 
 4. **React renders** the product using `ProductCard` component
-   - Images loaded from Supabase Storage public URLs
+   - Images loaded from Cloudinary CDN URLs (with auto WebP/AVIF conversion via URL transforms)
    - Cart interactions handled client-side via `CartContext`
 
 ---
@@ -228,10 +245,12 @@ d:\Brand2Brand\
 - `colors`: JSON array like `["Black", "Navy", "White"]`
 - `slug`: URL-friendly version of names (e.g., "Men's Clothing" → `mens-clothing`)
 
-### Storage:
-- Bucket: `product-images`
-- Images uploaded by admin with public URLs
-- URL format: `https://xpmudrchipnbmvlawsuw.supabase.co/storage/v1/object/public/product-images/{path}`
+### Image Storage (Cloudinary):
+- All product images are stored on **Cloudinary** (25 GB free tier)
+- Images uploaded by admin panel → Cloudinary returns CDN URL → URL stored in `product_images.image_url`
+- URL format: `https://res.cloudinary.com/dbj9ittfl/image/upload/v{version}/brand2brand/products/{product-id}/{filename}`
+- Cloudinary auto-transforms: `c_limit,w_{width},q_auto,f_auto` for on-the-fly resizing/format conversion
+- Legacy Supabase Storage URLs (from before migration) are still supported and functional
 
 ---
 
@@ -711,6 +730,12 @@ Create a `.env.local` file in the project root:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Cloudinary Configuration
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
 
 | Variable | Visibility | Purpose |
@@ -718,6 +743,10 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 | `NEXT_PUBLIC_SUPABASE_URL` | Public (browser) | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (browser) | Supabase anonymous key (read-only access) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Service role key (full access — never exposed to browser) |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Public (browser) | Cloudinary cloud name for URL construction |
+| `CLOUDINARY_CLOUD_NAME` | Server only | Cloudinary cloud name (for migration script) |
+| `CLOUDINARY_API_KEY` | Server only | Cloudinary API key (for migration script) |
+| `CLOUDINARY_API_SECRET` | Server only | Cloudinary API secret (for migration script) |
 
 ---
 
@@ -736,14 +765,17 @@ const nextConfig = {
   allowedDevOrigins: ['192.168.0.109'],   // LAN testing on mobile
   images: {
     remotePatterns: [
-      new URL('https://xpmudrchipnbmvlawsuw.supabase.co/**'),  // Supabase Storage
+      // Supabase Storage (legacy images)
+      { protocol: 'https', hostname: 'xpmudrchipnbmvlawsuw.supabase.co', pathname: '/storage/v1/object/public/**' },
+      // Cloudinary CDN (all new images)
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/*/image/upload/**' },
     ],
   },
 };
 ```
 
 - `allowedDevOrigins`: Allows dev server access from local network (for testing on phone)
-- `images.remotePatterns`: Whitelists the Supabase Storage domain for Next.js `<Image>` optimization
+- `images.remotePatterns`: Whitelists both **Cloudinary** (primary) and **Supabase Storage** (legacy) domains for Next.js `<Image>` optimization
 
 ---
 
@@ -863,18 +895,26 @@ LISTING_SELECT  → Same but without description, is_active, created_at
 
 ---
 
-#### 3. Supabase Image URL Transforms — WebP at Source
+#### 3. Image URL Transforms — Cloudinary + Legacy Supabase
 
 **File:** `src/lib/queries.js` → `optimizeImageUrl()`
 
-Every image URL from Supabase Storage is now transformed with query parameters:
+Every image URL is transformed at the CDN level for optimal delivery:
 
+**Cloudinary URLs (primary):**
+```
+Before: https://res.cloudinary.com/dbj9ittfl/image/upload/v123/brand2brand/products/.../cover.jpg
+After:  https://res.cloudinary.com/dbj9ittfl/image/upload/c_limit,w_800,q_auto,f_auto/v123/brand2brand/products/.../cover.jpg
+```
+Cloudinary's native transforms deliver auto-quality + auto-format (WebP/AVIF) at zero extra cost.
+
+**Legacy Supabase URLs (backward compatible):**
 ```
 Before: https://...supabase.co/.../product-images/shirt.jpg
 After:  https://...supabase.co/.../product-images/shirt.jpg?width=800&quality=85&format=webp
 ```
 
-**Impact:** Supabase returns the image as **WebP at 85% quality** — typically **60-70% smaller** than the original JPEG/PNG. A 500KB product photo becomes ~150KB.
+**Impact:** Images are served in the most efficient format (**WebP/AVIF**) at optimal quality — typically **60-70% smaller** than the original JPEG/PNG.
 
 ---
 
