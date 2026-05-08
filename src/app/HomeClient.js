@@ -1,263 +1,340 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import gsap from 'gsap/dist/gsap';
 import ProductCard from '@/components/ProductCard';
-import { useAtmosphere } from '@/context/AtmosphereContext';
 
-/* ── Animated Discount Banner ── */
-const BANNER_ITEMS = [
-  { emoji: '🎽', label: 'CLOTHING', pct: '10%', desc: 'Off All Clothing', color: '#C41230' },
-  { emoji: '👟', label: 'FOOTWEAR', pct: '20%', desc: 'Off All Footwear', color: '#B8860B' },
-  { emoji: '💎', label: 'ACCESSORIES', pct: '30%', desc: 'Off All Accessories', color: '#7C3AED' },
+/* ── Hero Carousel Slides (Real product images first) ── */
+const HERO_SLIDES = [
+  { image: '/catalog/floral-shirts/1.jpg', title: 'FLORAL SHIRTS', subtitle: 'PREMIUM | PRINTED | VIBRANT', tag: 'BESTSELLER' },
+  { image: '/catalog/tshirts/1.jpg', title: 'T-SHIRTS', subtitle: 'OVERSIZED | PRINTED | STREETWEAR', tag: 'NEW DROP' },
+  { image: '/catalog/barrel-fit-baggys/1.jpg', title: 'BARREL FIT BAGGYS', subtitle: 'KOREAN | BAGGY | PREMIUM', tag: 'TRENDING' },
+  { image: '/catalog/linen-shirts/1.jpg', title: 'LINEN SHIRTS', subtitle: 'BREATHABLE | SUMMER | COMFORT', tag: "SUMMER'26" },
+  { image: '/catalog/denim-baggys/1.jpg', title: 'DENIM BAGGYS', subtitle: 'PREMIUM DENIM | RELAXED FIT', tag: 'NEW' },
 ];
 
-function DiscountBanner() {
-  // Duplicate items so the scroll loops seamlessly
-  const tickers = [...BANNER_ITEMS, ...BANNER_ITEMS, ...BANNER_ITEMS, ...BANNER_ITEMS];
+/* ── Category Cards (Real product images) ── */
+const CATEGORIES = [
+  { name: 'T-SHIRTS', slug: 't-shirts', image: '/catalog/tshirts/3.jpg' },
+  { name: 'SHIRTS', slug: 'shirts', image: '/catalog/floral-shirts/2.jpg' },
+  { name: 'LINEN SHIRTS', slug: 'shirts', image: '/catalog/linen-shirts/2.jpg' },
+  { name: 'JEANS', slug: 'jeans', image: '/catalog/denim-baggys/2.jpg' },
+  { name: 'PANTS', slug: 'pants', image: '/catalog/barrel-fit-baggys/3.jpg' },
+  { name: 'SWEATSHIRTS', slug: 't-shirts', image: '/catalog/sweatshirts/1.jpg' },
+];
+
+/* ── Collection Cards (Real product images) ── */
+const COLLECTIONS = [
+  { name: 'FLORAL PRINTS', slug: 'summer-shirts', image: '/catalog/floral-shirts/4.jpg' },
+  { name: 'KOREAN COLLECTION', slug: 'korean-collection', image: '/catalog/barrel-fit-baggys/5.jpg' },
+  { name: 'CHECK SHIRTS', slug: null, image: '/catalog/check-shirts/1.jpg' },
+  { name: 'CULT CLASSICS', slug: 'cult-classics', image: '/catalog/tshirts/6.jpg' },
+  { name: 'CULTURE CODE', slug: 'culture-code', image: '/catalog/sweatshirts/2.jpg' },
+  { name: 'SUMMER SHIRTS', slug: 'summer-shirts', image: '/catalog/linen-shirts/3.jpg' },
+];
+
+/* ── Filter tabs for catalog ── */
+const FILTER_TABS = [
+  { slug: '', label: 'Trending' },
+  { slug: 't-shirts', label: 'T-Shirts' },
+  { slug: 'shirts', label: 'Shirts' },
+  { slug: 'pants', label: 'Baggys & Pants' },
+  { slug: 'jeans', label: 'Denim' },
+];
+
+/* ══════════════════════════════════════════════
+   Hero Carousel Component
+   ══════════════════════════════════════════════ */
+function HeroCarousel() {
+  const [current, setCurrent] = useState(0);
+  const touchStartX = useRef(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent(p => (p + 1) % HERO_SLIDES.length), 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      diff > 0
+        ? setCurrent(p => (p + 1) % HERO_SLIDES.length)
+        : setCurrent(p => (p === 0 ? HERO_SLIDES.length - 1 : p - 1));
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <div className="discount-banner" aria-label="Current promotions">
-      <div className="discount-banner-label">OFFERS</div>
-      <div className="discount-ticker-wrap">
-        <div className="discount-ticker">
-          {tickers.map((item, i) => (
-            <div className="discount-ticker-item" key={i}>
-              <span className="dt-emoji">{item.emoji}</span>
-              <span className="dt-pct">{item.pct}</span>
-              <span className="dt-desc">{item.desc}</span>
-              <span className="dt-sep">✦</span>
+    <div className="hero-carousel" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className="hero-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+        {HERO_SLIDES.map((slide, i) => (
+          <div className="hero-carousel-slide" key={i}>
+            <Image src={slide.image} alt={slide.title} fill sizes="100vw" priority={i === 0}
+              style={{ objectFit: 'cover' }} />
+            <div className="hero-carousel-overlay">
+              <div className="hero-carousel-text">
+                <h2>{slide.title}</h2>
+                <p>{slide.subtitle}</p>
+              </div>
+              {slide.tag && (
+                <div className="hero-carousel-tag">{slide.tag}</div>
+              )}
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+      <div className="hero-carousel-dots">
+        {HERO_SLIDES.map((_, i) => (
+          <button key={i} className={`hero-dot ${i === current ? 'active' : ''}`}
+            onClick={() => setCurrent(i)} aria-label={`Slide ${i + 1}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   Feature Bar (Trust Badges)
+   ══════════════════════════════════════════════ */
+function FeatureBar() {
+  return (
+    <div className="feature-bar">
+      <div className="feature-bar-item">
+        <span className="feature-bar-icon">💰</span>
+        <div className="feature-bar-text">
+          <strong>10% Discount</strong>
+          <span>on All Orders</span>
+        </div>
+      </div>
+      <div className="feature-bar-item">
+        <span className="feature-bar-icon">🏪</span>
+        <div className="feature-bar-text">
+          <strong>Visit Our Store</strong>
+          <span>Vizag, AP</span>
+        </div>
+      </div>
+      <div className="feature-bar-item">
+        <span className="feature-bar-icon">💬</span>
+        <div className="feature-bar-text">
+          <strong>WhatsApp</strong>
+          <span>to Order</span>
         </div>
       </div>
     </div>
   );
 }
 
-export default function HomeClient({ featured, newArrivals }) {
-  const heroRef = useRef(null);
-  const { setCurrentAtmosphere } = useAtmosphere();
+/* ══════════════════════════════════════════════
+   Horizontal Scroll Carousel with Dots
+   ══════════════════════════════════════════════ */
+function ScrollCarousel({ items, renderItem, itemWidth = 'calc(50% - 6px)' }) {
+  const scrollRef = useRef(null);
+  const [activeDot, setActiveDot] = useState(0);
+  const totalPages = Math.ceil(items.length / 2);
 
-  useEffect(() => {
-    setCurrentAtmosphere('default');
-  }, [setCurrentAtmosphere]);
-
-  useEffect(() => {
-    if (!heroRef.current) return;
-
-    // Respect OS accessibility setting only
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      gsap.set('.hero-badge, .hero h1, .hero-subtitle, .hero-cta-group', { opacity: 1, y: 0 });
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay: 0.3 });
-
-      tl.to('.hero-badge', {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: 'power3.out',
-      });
-
-      tl.to('.hero h1', {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-      }, '-=0.3');
-
-      tl.to('.hero-subtitle', {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: 'power3.out',
-      }, '-=0.4');
-
-      tl.to('.hero-cta-group', {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: 'power3.out',
-      }, '-=0.3');
-    }, heroRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  const [clientParticles, setClientParticles] = useState(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setClientParticles(Array.from({ length: 20 }, (_, i) => ({
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 10}s`,
-        animationDuration: `${10 + Math.random() * 10}s`,
-        width: `${1 + Math.random() * 3}px`,
-        height: `${1 + Math.random() * 3}px`,
-      })));
-    }, 0);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    const page = Math.round(scrollLeft / (scrollWidth - clientWidth) * (totalPages - 1));
+    setActiveDot(Math.min(page, totalPages - 1));
+  }, [totalPages]);
 
   return (
-    <>
-      {/* HERO SECTION */}
-      <section className="hero" ref={heroRef} id="hero-section">
-        <div className="hero-bg" />
-        <div className="hero-particles">
-          {clientParticles && clientParticles.map((p, i) => (
-            <div
-              key={i}
-              className="hero-particle"
-              style={p}
+    <div className="scroll-carousel">
+      <div className="scroll-carousel-track" ref={scrollRef} onScroll={handleScroll}>
+        {items.map((item, i) => (
+          <div key={i} className="scroll-carousel-item" style={{ minWidth: itemWidth, maxWidth: itemWidth }}>
+            {renderItem(item, i)}
+          </div>
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="scroll-carousel-dots">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button key={i} className={`carousel-dot ${i === activeDot ? 'active' : ''}`}
+              aria-label={`Page ${i + 1}`}
+              onClick={() => {
+                if (!scrollRef.current) return;
+                const { scrollWidth, clientWidth } = scrollRef.current;
+                scrollRef.current.scrollTo({
+                  left: (scrollWidth - clientWidth) * (i / (totalPages - 1)),
+                  behavior: 'smooth',
+                });
+              }}
             />
           ))}
         </div>
+      )}
+    </div>
+  );
+}
 
-        <div className="hero-content">
-          <div className="hero-badge">Est. Visakhapatnam</div>
-          <h1>
-            BRAND <span className="hero-2">2</span> BRAND&apos;S
-          </h1>
-          <p className="hero-subtitle">
-            Vizag&apos;s premier destination for men&apos;s fashion, footwear &amp; luxury accessories
-          </p>
-          <div className="hero-cta-group">
-            <Link href="/clothing" className="btn-magnetic">
-              EXPLORE COLLECTION
-            </Link>
-            <Link href="/contact" className="btn-magnetic btn-magnetic--outline" style={{ borderColor: '#fff', color: '#fff' }}>
-              VISIT STORE
-            </Link>
-          </div>
-        </div>
+/* ══════════════════════════════════════════════
+   Trending Product Card (for Trending in Pants)
+   ══════════════════════════════════════════════ */
+function TrendingCard({ product, labels }) {
+  return (
+    <Link href={`/product/${product.id}`} className="trending-card">
+      <div className="trending-card-header">
+        <strong>{labels.title}</strong>
+      </div>
+      <div className="trending-card-image">
+        <Image src={product.images[0]} alt={product.name} fill sizes="50vw"
+          style={{ objectFit: 'contain' }} />
+        {labels.corners && labels.corners.map((corner, i) => (
+          <span key={i} className={`trending-corner trending-corner-${i}`}>{corner}</span>
+        ))}
+      </div>
+      <div className="trending-card-info">
+        <div className="trending-card-name">{product.name}</div>
+        <div className="trending-card-sub">{labels.subtitle}</div>
+        <div className="trending-card-price">₹ {product.price.toLocaleString()}</div>
+      </div>
+    </Link>
+  );
+}
 
-        <div className="hero-scroll-indicator">
-          <span>SCROLL</span>
-          <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="1" y="1" width="14" height="22" rx="7"/>
-            <circle cx="8" cy="8" r="2" fill="currentColor">
-              <animate attributeName="cy" values="8;16;8" dur="2s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
+/* ══════════════════════════════════════════════
+   Main Home Client
+   ══════════════════════════════════════════════ */
+export default function HomeClient({ featured, newArrivals, allProducts }) {
+  const [catalogFilter, setCatalogFilter] = useState('');
+
+  const catalogProducts = catalogFilter
+    ? allProducts.filter(p => p.subcategory === catalogFilter)
+    : featured.length > 0 ? featured : allProducts.slice(0, 8);
+
+  // Get specific products for trending section
+  const trendingPants = allProducts.filter(p => p.subcategory === 'pants');
+  const easyPants = trendingPants[0] || allProducts[0];
+  const gurkhaPants = trendingPants[1] || allProducts[1];
+
+  return (
+    <>
+      {/* ═══ HERO CAROUSEL ═══ */}
+      <HeroCarousel />
+
+      {/* ═══ FEATURE BAR ═══ */}
+      <FeatureBar />
+
+      {/* ═══ LATEST DROPS BANNER ═══ */}
+      <section className="section-block" id="latest-drops">
+        <div className="container">
+          <h2 className="section-heading">LATEST DROPS</h2>
+          <Link href="/clothing?filter=new" className="latest-drops-banner">
+            <Image src="/catalog/zipper-shirts/1.jpg" alt="Latest Drops"
+              fill sizes="100vw" style={{ objectFit: 'cover' }} />
+            <div className="latest-drops-overlay">
+              <span className="latest-drops-tag">JUST DROPPED</span>
+              <h3>NEW COLLECTION 2026</h3>
+            </div>
+          </Link>
         </div>
       </section>
 
-      {/* DISCOUNT BANNER */}
-      <DiscountBanner />
-
-      {/* ATMOSPHERES */}
-      <section className="atmospheres-section" id="atmospheres">
+      {/* ═══ NEW ARRIVALS ═══ */}
+      <section className="section-block" id="new-arrivals">
         <div className="container">
-          <h2 className="section-title">EXPLORE OUR WORLDS</h2>
-          <div className="atmospheres-grid">
-            <Link href="/clothing" className="atmosphere-card">
-              <div className="atmosphere-card-bg" style={{
-                backgroundImage: 'url(/images/clothing-atmosphere.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }} />
-              <div className="atmosphere-card-overlay" />
-              <div className="atmosphere-card-content">
-                <h3 className="atmosphere-card-title">MEN&apos;S CLOTHING</h3>
-              </div>
-            </Link>
-
-            <Link href="/footwear" className="atmosphere-card">
-              <div className="atmosphere-card-bg" style={{
-                backgroundImage: 'url(/images/footwear-atmosphere.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }} />
-              <div className="atmosphere-card-overlay" />
-              <div className="atmosphere-card-content">
-                <h3 className="atmosphere-card-title">FOOTWEAR HUB</h3>
-              </div>
-            </Link>
-
-            <Link href="/accessories" className="atmosphere-card">
-              <div className="atmosphere-card-bg" style={{
-                backgroundImage: 'url(/images/accessories-atmosphere.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }} />
-              <div className="atmosphere-card-overlay" />
-              <div className="atmosphere-card-content">
-                <h3 className="atmosphere-card-title">ACCESSORIES</h3>
-              </div>
-            </Link>
-          </div>
+          <h2 className="section-heading">NEW ARRIVALS</h2>
+          <ScrollCarousel
+            items={newArrivals.length > 0 ? newArrivals : allProducts.slice(0, 8)}
+            renderItem={(product) => <ProductCard product={product} compact />}
+          />
         </div>
       </section>
 
-      {/* TRENDING */}
-      <section className="trending-section" id="trending">
+      {/* ═══ CATEGORIES ═══ */}
+      <section className="section-block" id="categories">
         <div className="container">
-          <h2 className="section-title" style={{ color: '#fff' }}>TRENDING NOW</h2>
-          <div className="products-grid">
-            {featured.map(product => (
-              <ProductCard key={product.id} product={product} hideColorThumbs />
+          <h2 className="section-heading">CATEGORIES</h2>
+          <div className="categories-grid">
+            {CATEGORIES.map(cat => (
+              <Link key={cat.name} href={`/clothing?subcategory=${cat.slug}`} className="category-card">
+                <div className="category-card-img">
+                  <Image src={cat.image} alt={cat.name} fill sizes="33vw"
+                    style={{ objectFit: 'cover' }} />
+                </div>
+                <span className="category-card-name">{cat.name}</span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* NEW ARRIVALS */}
-      <section className="products-section" id="new-arrivals">
-        <div className="container">
-          <h2 className="section-title">NEW ARRIVALS</h2>
-          <div className="products-grid">
-            {newArrivals.map(product => (
-              <ProductCard key={product.id} product={product} hideColorThumbs />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* BRAND STORY */}
-      <section className="brand-story" id="brand-story">
-        <div className="container">
-          <div className="brand-story-grid">
-            {/* Visual FIRST on all screen sizes */}
-            <div className="brand-story-visual" style={{ position: 'relative' }}>
-              <Image
-                src="/images/brand_story_visual.png"
-                alt="Brand 2 Brand — Born in the City of Destiny, Visakhapatnam"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                style={{ objectFit: 'cover' }}
+      {/* ═══ TRENDING IN PANTS ═══ */}
+      {easyPants && gurkhaPants && (
+        <section className="section-block" id="trending-pants">
+          <div className="container">
+            <h2 className="section-heading">TRENDING IN PANTS</h2>
+            <div className="trending-grid">
+              <TrendingCard
+                product={easyPants}
+                labels={{
+                  title: 'BARREL FIT BAGGYS',
+                  subtitle: 'Barrel Fit',
+                  corners: ['KOREAN FIT', 'PREMIUM FABRIC'],
+                }}
+              />
+              <TrendingCard
+                product={gurkhaPants}
+                labels={{
+                  title: 'DENIM BAGGYS',
+                  subtitle: 'Denim Baggy',
+                  corners: ['BAGGY FIT', 'PREMIUM DENIM'],
+                }}
               />
             </div>
-            {/* Content below / on right */}
-            <div className="brand-story-content">
-              <h2>BORN IN THE <span className="accent-text">CITY OF DESTINY</span></h2>
-              <p>
-                From the vibrant streets of Pedda Waltair to the sun-kissed shores of 
-                RK Beach, Brand Two Brand was born with a mission: to bring world-class 
-                men&apos;s fashion to the heart of Visakhapatnam.
-              </p>
-              <p>
-                Every piece in our collection is curated with the same passion that makes 
-                Vizag special—a perfect blend of tradition and modernity, comfort and style. 
-                Whether it&apos;s the perfect floral shirt for a beach evening or a precision 
-                timepiece for a formal gathering, we bring the world&apos;s best to your doorstep.
-              </p>
-              <div style={{ textAlign: 'center', marginTop: '24px' }}>
-                <a
-                  href="https://www.google.com/maps/search/Brand+Two+Brand+Pedda+Waltair+Visakhapatnam"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-magnetic"
-                >
-                  VISIT OUR STORE
-                </a>
-              </div>
-            </div>
+            <ScrollCarousel
+              items={trendingPants.length > 2 ? trendingPants : allProducts.filter(p => ['pants', 'joggers'].includes(p.subcategory))}
+              renderItem={(product) => <ProductCard product={product} compact />}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* ═══ CURATED FOR YOU ═══ */}
+      <section className="section-block" id="curated">
+        <div className="container">
+          <h2 className="section-heading">CURATED FOR YOU</h2>
+          <div className="collections-grid">
+            {COLLECTIONS.map(col => (
+              <Link key={col.name} href={col.slug ? `/clothing?collection=${col.slug}` : '/clothing'} className="collection-card">
+                <div className="collection-card-img">
+                  <Image src={col.image} alt={col.name} fill sizes="33vw"
+                    style={{ objectFit: 'cover' }} />
+                  <div className="collection-card-overlay">
+                    <span className="collection-card-name">{col.name}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ALL PRODUCTS CATALOG ═══ */}
+      <section className="section-block section-block--grey" id="catalog">
+        <div className="container">
+          {/* Filter Pills */}
+          <div className="filter-chips">
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab.slug}
+                className={`filter-chip ${catalogFilter === tab.slug ? 'active' : ''}`}
+                onClick={() => setCatalogFilter(tab.slug)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          {/* Product Grid */}
+          <div className="products-grid">
+            {catalogProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </section>

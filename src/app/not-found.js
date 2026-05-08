@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: "404 — Page Not Found | Brand Two Brand's",
+  title: '404 — Page Not Found | Cult Clothing',
   description: 'The page you are looking for does not exist.',
 };
 
@@ -37,7 +37,7 @@ export default function NotFound() {
           <Link
             href="/clothing"
             className="btn-magnetic btn-magnetic--outline"
-            style={{ borderColor: '#B8860B', color: '#B8860B' }}
+            style={{ borderColor: 'var(--color-teal)', color: 'var(--color-teal)' }}
             id="explore-btn"
           >
             EXPLORE CLOTHING
@@ -46,7 +46,7 @@ export default function NotFound() {
 
         {/* Floating brand watermark */}
         <div className="not-found-watermark">
-          BRAND<span className="not-found-watermark-2">2</span>BRAND&apos;S
+          CULT<span className="not-found-watermark-2"> </span>CLOTHING
         </div>
       </div>
     </section>
