@@ -48,25 +48,28 @@ const FILTER_TABS = [
    ══════════════════════════════════════════════ */
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
-  const touchStartX = useRef(null);
+  const scrollRef = useRef(null);
 
-  // Removed auto-sliding per user request
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    // Calculate which slide is most visible
+    const slideIndex = Math.round(scrollLeft / clientWidth);
+    setCurrent(slideIndex);
+  }, []);
 
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      diff > 0
-        ? setCurrent(p => (p + 1) % HERO_SLIDES.length)
-        : setCurrent(p => (p === 0 ? HERO_SLIDES.length - 1 : p - 1));
-    }
-    touchStartX.current = null;
+  const scrollToSlide = (index) => {
+    if (!scrollRef.current) return;
+    const { clientWidth } = scrollRef.current;
+    scrollRef.current.scrollTo({
+      left: clientWidth * index,
+      behavior: 'smooth',
+    });
   };
 
   return (
-    <div className="hero-carousel" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} style={{ touchAction: 'pan-y' }}>
-      <div className="hero-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+    <div className="hero-carousel">
+      <div className="hero-carousel-track" ref={scrollRef} onScroll={handleScroll}>
         {HERO_SLIDES.map((slide, i) => (
           <div className="hero-carousel-slide" key={i}>
             <div className="hero-carousel-image">
@@ -88,7 +91,7 @@ function HeroCarousel() {
       <div className="hero-carousel-dots">
         {HERO_SLIDES.map((_, i) => (
           <button key={i} className={`hero-dot ${i === current ? 'active' : ''}`}
-            onClick={() => setCurrent(i)} aria-label={`Slide ${i + 1}`} />
+            onClick={() => scrollToSlide(i)} aria-label={`Slide ${i + 1}`} />
         ))}
       </div>
     </div>
