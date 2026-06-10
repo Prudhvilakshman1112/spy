@@ -37,7 +37,7 @@ export default function Header({ onSearchOpen }) {
           {/* Center: Logo */}
           <Link href="/" className="header-logo" id="brand-logo">
             <Image src="/images/spy-logo.jpeg" alt="SPY Multibrand Stores" width={140} height={50}
-              style={{ objectFit: 'contain' }} priority />
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }} priority />
           </Link>
 
           {/* Right: Search, Wishlist, Cart */}
