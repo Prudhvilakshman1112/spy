@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '32px' }}>
           <div>
-            <Image src="/images/spy-logo.png" alt="SPY Multibrand Stores" width={130} height={46}
+            <Image src="/images/spy-logo.jpeg" alt="SPY Multibrand Stores" width={130} height={46}
               style={{ objectFit: 'contain' }} />
             <p style={{ fontSize: '0.82rem', color: '#999', marginTop: '10px', lineHeight: 1.6 }}>
               Your Fashion Detective 🕵️<br />

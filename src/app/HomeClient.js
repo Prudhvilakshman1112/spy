@@ -69,8 +69,10 @@ function HeroCarousel() {
       <div className="hero-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         {HERO_SLIDES.map((slide, i) => (
           <div className="hero-carousel-slide" key={i}>
-            <Image src={slide.image} alt={slide.title} fill sizes="100vw" priority={i === 0}
-              style={{ objectFit: 'cover' }} draggable={false} />
+            <div className="hero-carousel-image">
+              <Image src={slide.image} alt={slide.title} fill sizes="(max-width: 768px) 100vw, 50vw" priority={i === 0}
+                style={{ objectFit: 'cover' }} draggable={false} />
+            </div>
             <div className="hero-carousel-overlay">
               <div className="hero-carousel-text">
                 <h2>{slide.title}</h2>

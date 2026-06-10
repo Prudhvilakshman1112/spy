@@ -67,8 +67,10 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           </Link>
         </div>
 
-        {/* ── Image Carousel ── */}
-        <div
+        {/* ── Desktop Split Wrapper ── */}
+        <div className="pd-desktop-split">
+          {/* ── Image Carousel ── */}
+          <div
           className="pd-gallery"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -208,7 +210,28 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             </svg>
             ENQUIRE ON WHATSAPP
           </a>
+
+          {/* ── Desktop/Mobile Action Bar ── */}
+          <div className="pd-bottom-bar">
+            <button
+              className={`pd-bottom-wishlist ${wishlisted ? 'active' : ''}`}
+              onClick={() => toggleWishlist(product.id)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24"
+                fill={wishlisted ? '#FF6B1A' : 'none'}
+                stroke={wishlisted ? '#FF6B1A' : 'currentColor'}
+                strokeWidth="2"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              WISHLIST
+            </button>
+            <button className="pd-bottom-cart" onClick={handleAddToCart} id="add-to-cart-btn">
+              ADD TO CART
+            </button>
+          </div>
         </div>
+      </div>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
@@ -225,25 +248,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
         )}
       </section>
 
-      {/* ── Fixed Bottom Action Bar ── */}
-      <div className="pd-bottom-bar">
-        <button
-          className={`pd-bottom-wishlist ${wishlisted ? 'active' : ''}`}
-          onClick={() => toggleWishlist(product.id)}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24"
-            fill={wishlisted ? '#FF6B1A' : 'none'}
-            stroke={wishlisted ? '#FF6B1A' : 'currentColor'}
-            strokeWidth="2"
-          >
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-          WISHLIST
-        </button>
-        <button className="pd-bottom-cart" onClick={handleAddToCart} id="add-to-cart-btn">
-          ADD TO CART
-        </button>
-      </div>
+      {/* Bottom bar moved inside info for desktop, but still fixed for mobile via CSS */}
     </>
   );
 }
