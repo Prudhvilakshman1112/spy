@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const WishlistContext = createContext(null);
-const STORAGE_KEY = 'cult-wishlist';
+const STORAGE_KEY = 'spy-wishlist';
 
 export function WishlistProvider({ children }) {
   const [wishlistIds, setWishlistIds] = useState([]);

@@ -1,455 +1,462 @@
-/**
- * Cult Clothing — Product catalog built from actual product folders
- * Real products come FIRST, AI-generated fillers come AFTER
- */
-
-export const DUMMY_PRODUCTS = [
-  // ═══════════════════════════════════════════════
-  // REAL PRODUCTS — From d:\cult\products\ folders
-  // ═══════════════════════════════════════════════
-
-  // ─── FLORAL PRINT SHIRTS (8 images = multiple colors) ───
-  {
-    id: 'floral-shirt-001',
-    name: 'Floral Print Shirt',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'shirts',
-    price: 1499,
-    originalPrice: 1999,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Black Floral', 'White Floral', 'Navy Floral', 'Maroon Floral'],
-    badge: 'BESTSELLER',
-    fit: 'Regular Fit',
-    stock: 40,
-    collection: 'summer-shirts',
-    description: 'Premium floral printed shirts with vibrant patterns. Perfect for casual outings and weekend vibes.',
-    images: [
-      '/catalog/floral-shirts/1.jpg',
-      '/catalog/floral-shirts/2.jpg',
-      '/catalog/floral-shirts/3.jpg',
-      '/catalog/floral-shirts/4.jpg',
-      '/catalog/floral-shirts/5.jpg',
-      '/catalog/floral-shirts/6.jpg',
-      '/catalog/floral-shirts/7.jpg',
-      '/catalog/floral-shirts/8.jpg',
-    ],
-    colorImages: {
-      'Black Floral': 0,
-      'White Floral': 2,
-      'Navy Floral': 4,
-      'Maroon Floral': 6,
-    },
-  },
-
-  // ─── CHECK SHIRTS (8 images = multiple colors) ───
-  {
-    id: 'check-shirt-001',
-    name: 'Check Shirt',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'shirts',
-    price: 1299,
-    originalPrice: 1799,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Blue Check', 'Red Check', 'Green Check', 'Brown Check'],
-    badge: 'NEW',
-    fit: 'Regular Fit',
-    stock: 50,
-    collection: null,
-    description: 'Classic check pattern shirts crafted from premium cotton. Timeless style for every occasion.',
-    images: [
-      '/catalog/check-shirts/1.jpg',
-      '/catalog/check-shirts/2.jpg',
-      '/catalog/check-shirts/3.jpg',
-      '/catalog/check-shirts/4.jpg',
-      '/catalog/check-shirts/5.jpg',
-      '/catalog/check-shirts/6.jpg',
-      '/catalog/check-shirts/7.jpg',
-      '/catalog/check-shirts/8.jpg',
-    ],
-    colorImages: {
-      'Blue Check': 0,
-      'Red Check': 2,
-      'Green Check': 4,
-      'Brown Check': 6,
-    },
-  },
-
-  // ─── LINEN SHIRTS (5 images = multiple colors) ───
-  {
-    id: 'linen-shirt-001',
-    name: 'Linen Shirt',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'shirts',
-    price: 1599,
-    originalPrice: 2199,
-    sizes: ['S', 'M', 'L'],
-    colors: ['White', 'Beige', 'Sky Blue'],
-    badge: 'TRENDING',
-    fit: 'Relaxed Fit',
-    stock: 30,
-    collection: 'summer-shirts',
-    description: 'Breathable linen shirts in soft pastel tones. Lightweight comfort perfect for Vizag summers.',
-    images: [
-      '/catalog/linen-shirts/1.jpg',
-      '/catalog/linen-shirts/2.jpg',
-      '/catalog/linen-shirts/3.jpg',
-      '/catalog/linen-shirts/4.jpg',
-      '/catalog/linen-shirts/5.jpg',
-    ],
-    colorImages: {
-      'White': 0,
-      'Beige': 2,
-      'Sky Blue': 4,
-    },
-  },
-
-  // ─── ZIPPER SHIRTS (5 images = multiple colors) ───
-  {
-    id: 'zipper-shirt-001',
-    name: 'Zipper Shirt',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'shirts',
-    price: 1699,
-    originalPrice: 2299,
-    sizes: ['S', 'M', 'L'],
-    colors: ['Black', 'White', 'Navy'],
-    badge: 'EXCLUSIVE',
-    fit: 'Slim Fit',
-    stock: 25,
-    collection: 'cult-classics',
-    description: 'Trendy zipper detail shirts with a modern edge. Stand out from the crowd with this unique design.',
-    images: [
-      '/catalog/zipper-shirts/1.jpg',
-      '/catalog/zipper-shirts/2.jpg',
-      '/catalog/zipper-shirts/3.jpg',
-      '/catalog/zipper-shirts/4.jpg',
-      '/catalog/zipper-shirts/5.jpg',
-    ],
-    colorImages: {
-      'Black': 0,
-      'White': 2,
-      'Navy': 4,
-    },
-  },
-
-  // ─── T-SHIRTS (14 images = many colors) ───
+export const products = [
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — ORCA Japanese Art
+  // ═══════════════════════════════════════════
   {
     id: 'tshirt-001',
-    name: 'Printed T-Shirt Collection',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 't-shirts',
-    price: 799,
-    originalPrice: 1199,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: ['Black', 'White', 'Grey', 'Navy', 'Olive', 'Maroon', 'Red'],
-    badge: 'BESTSELLER',
-    fit: 'Oversized Fit',
-    stock: 100,
-    collection: 'cult-classics',
-    description: 'Trendy printed t-shirts in multiple colors. Premium cotton with bold designs for everyday streetwear.',
-    images: [
-      '/catalog/tshirts/1.jpg',
-      '/catalog/tshirts/3.jpg',
-      '/catalog/tshirts/5.jpg',
-      '/catalog/tshirts/6.jpg',
-      '/catalog/tshirts/7.jpg',
-      '/catalog/tshirts/8.jpg',
-      '/catalog/tshirts/9.jpg',
-      '/catalog/tshirts/10.jpg',
-      '/catalog/tshirts/11.jpg',
-      '/catalog/tshirts/12.jpg',
-      '/catalog/tshirts/13.jpg',
-      '/catalog/tshirts/14.jpg',
-      '/catalog/tshirts/15.jpg',
-      '/catalog/tshirts/16.jpg',
-    ],
-    colorImages: {
-      'Black': 0,
-      'White': 2,
-      'Grey': 4,
-      'Navy': 6,
-      'Olive': 8,
-      'Maroon': 10,
-      'Red': 12,
-    },
-  },
-
-  // ─── SWEATSHIRTS (3 images) ───
-  {
-    id: 'sweatshirt-001',
-    name: 'Back Printed Sweatshirt',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 't-shirts',
-    price: 1299,
-    originalPrice: 1799,
-    sizes: ['M', 'L', 'XL'],
-    colors: ['Black', 'Grey'],
-    badge: 'NEW',
-    fit: 'Oversized Fit',
-    stock: 35,
-    collection: 'culture-code',
-    description: 'Premium back printed sweatshirts with bold graphic designs. Heavy-weight fleece for cozy comfort.',
-    images: [
-      '/catalog/sweatshirts/1.jpg',
-      '/catalog/sweatshirts/2.jpg',
-      '/catalog/sweatshirts/3.jpg',
-    ],
-    colorImages: {
-      'Black': 0,
-      'Grey': 2,
-    },
-  },
-
-  // ─── BARREL FIT BAGGYS (12 images = multiple colors) ───
-  {
-    id: 'barrel-baggy-001',
-    name: 'Barrel Fit Baggys',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'pants',
-    price: 1899,
-    originalPrice: 2499,
-    sizes: ['28', '30', '32', '34'],
-    colors: ['Black', 'Charcoal', 'Khaki', 'Olive', 'Brown', 'Navy'],
-    badge: 'TRENDING',
-    fit: 'Barrel Fit',
-    stock: 40,
-    collection: 'korean-collection',
-    description: 'Barrel fit baggy pants with a Korean-inspired silhouette. Premium fabric with relaxed comfortable fit.',
-    images: [
-      '/catalog/barrel-fit-baggys/1.jpg',
-      '/catalog/barrel-fit-baggys/2.jpg',
-      '/catalog/barrel-fit-baggys/3.jpg',
-      '/catalog/barrel-fit-baggys/4.jpg',
-      '/catalog/barrel-fit-baggys/5.jpg',
-      '/catalog/barrel-fit-baggys/6.jpg',
-      '/catalog/barrel-fit-baggys/7.jpg',
-      '/catalog/barrel-fit-baggys/8.jpg',
-      '/catalog/barrel-fit-baggys/9.jpg',
-      '/catalog/barrel-fit-baggys/10.jpg',
-      '/catalog/barrel-fit-baggys/11.jpg',
-      '/catalog/barrel-fit-baggys/12.jpg',
-    ],
-    colorImages: {
-      'Black': 0,
-      'Charcoal': 2,
-      'Khaki': 4,
-      'Olive': 6,
-      'Brown': 8,
-      'Navy': 10,
-    },
-  },
-
-  // ─── DENIM BAGGYS (7 images = multiple colors) ───
-  {
-    id: 'denim-baggy-001',
-    name: 'Denim Baggys',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'jeans',
-    price: 2199,
-    originalPrice: 2799,
-    sizes: ['28', '30', '32', '34'],
-    colors: ['Light Blue', 'Dark Blue', 'Black Wash'],
-    badge: 'NEW',
-    fit: 'Baggy Fit',
-    stock: 30,
-    collection: 'korean-collection',
-    description: 'Premium denim baggy jeans with relaxed fit. All India delivery available.',
-    images: [
-      '/catalog/denim-baggys/1.jpg',
-      '/catalog/denim-baggys/2.jpg',
-      '/catalog/denim-baggys/3.jpg',
-      '/catalog/denim-baggys/4.jpg',
-      '/catalog/denim-baggys/5.jpg',
-      '/catalog/denim-baggys/6.jpg',
-      '/catalog/denim-baggys/7.jpg',
-    ],
-    colorImages: {
-      'Light Blue': 0,
-      'Dark Blue': 2,
-      'Black Wash': 4,
-    },
-  },
-
-  // ═══════════════════════════════════════════════
-  // AI-GENERATED FILLER PRODUCTS (shown after real)
-  // ═══════════════════════════════════════════════
-
-  {
-    id: 'ai-tshirt-001',
-    name: 'Textured T-Shirt: Verizon',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 't-shirts',
-    price: 1299,
-    originalPrice: 1599,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: ['Navy', 'Black'],
-    badge: null,
-    fit: 'Oversized Fit',
-    stock: 50,
-    collection: null,
-    description: 'Premium textured oversized tee with a contemporary silhouette.',
-    images: ['/images/products/oversized-tee-navy.png'],
-    colorImages: {},
-  },
-  {
-    id: 'ai-tshirt-002',
-    name: 'Oversized T-Shirt: Rose Wine',
-    brand: 'Cult Clothing',
+    name: 'ORCA Japanese Art Tee',
+    brand: 'SPY',
     category: 'clothing',
     subcategory: 't-shirts',
     price: 899,
-    originalPrice: 1199,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Rose', 'Beige'],
-    badge: null,
-    fit: 'Oversized Fit',
-    stock: 60,
-    collection: null,
-    description: 'Premium heavy gauge fabric oversized tee in stunning rose wine shade.',
-    images: ['/images/products/oversized-tee-pink.png'],
-    colorImages: {},
+    originalPrice: 1499,
+    description: 'Oversized acid-wash graphic tee featuring a stunning Japanese Orca whale print. Vintage wash finish with dropped shoulders for that premium streetwear look.',
+    sizes: ['M', 'L', 'XL'],
+    colors: ['Charcoal'],
+    badge: 'BESTSELLER',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/1.png'],
+    colorImages: { 'Charcoal': 0 },
   },
+
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — Chemistry (Burgundy)
+  // ═══════════════════════════════════════════
   {
-    id: 'ai-shirt-001',
-    name: 'Satin Shirt: State Of Mind',
-    brand: 'Cult Clothing',
+    id: 'tshirt-002',
+    name: 'Chemistry Acid Wash Tee - Burgundy',
+    brand: 'SPY',
     category: 'clothing',
-    subcategory: 'shirts',
-    price: 1699,
-    originalPrice: 2199,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['White', 'Black'],
-    badge: null,
-    fit: 'Relaxed Fit',
-    stock: 30,
-    collection: 'old-money',
-    description: 'Luxurious satin shirt with contrast piping details.',
-    images: ['/images/products/satin-shirt-white.png'],
-    colorImages: {},
+    subcategory: 't-shirts',
+    price: 799,
+    originalPrice: 1299,
+    description: 'Bold "Chemistry Between Us" graphic oversized t-shirt in acid-washed burgundy. Raw seam detailing and relaxed fit for effortless street style.',
+    sizes: ['M', 'L', 'XL'],
+    colors: ['Burgundy'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/2.png'],
+    colorImages: { 'Burgundy': 0 },
   },
+
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — Chemistry (Teal)
+  // ═══════════════════════════════════════════
   {
-    id: 'ai-polo-001',
-    name: 'Piping Polo: Royal Blue',
-    brand: 'Cult Clothing',
+    id: 'tshirt-003',
+    name: 'Chemistry Acid Wash Tee - Teal',
+    brand: 'SPY',
     category: 'clothing',
-    subcategory: 'polos',
-    price: 1599,
+    subcategory: 't-shirts',
+    price: 799,
+    originalPrice: 1299,
+    description: 'Bold "Chemistry Between Us" graphic oversized t-shirt in acid-washed teal. Raw seam detailing with back text print for effortless street style.',
+    sizes: ['M', 'L', 'XL'],
+    colors: ['Teal'],
+    badge: 'NEW',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/3.png'],
+    colorImages: { 'Teal': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — Sound of the King
+  // ═══════════════════════════════════════════
+  {
+    id: 'tshirt-004',
+    name: 'Sound of the King Puff Print Tee',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 't-shirts',
+    price: 849,
+    originalPrice: 1399,
+    description: 'Premium "Sound of the King" 3D puff-print oversized tee in white. All-over newspaper text graphic with bold back print. Drop-shoulder fit.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['White'],
+    badge: null,
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/4.png'],
+    colorImages: { 'White': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — Japanese Sunset Boat
+  // ═══════════════════════════════════════════
+  {
+    id: 'tshirt-005',
+    name: 'Japanese Sunset Boat Tee',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 't-shirts',
+    price: 899,
+    originalPrice: null,
+    description: 'Vintage acid-washed long sleeve tee with Japanese sunset and boat artwork. Red sun motif with kanji text. Premium oversized fit.',
+    sizes: ['M', 'L', 'XL'],
+    colors: ['Washed Charcoal'],
+    badge: 'EXCLUSIVE',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/5.png'],
+    colorImages: { 'Washed Charcoal': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // GRAPHIC T-SHIRTS — African Lion Art
+  // ═══════════════════════════════════════════
+  {
+    id: 'tshirt-006',
+    name: 'African Lion Art Tee',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 't-shirts',
+    price: 849,
+    originalPrice: 1399,
+    description: 'Stunning geometric African lion artwork on a washed charcoal oversized tee. Vibrant multicolor print with sunset savanna backdrop.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Washed Charcoal'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/tshirts/6.png'],
+    colorImages: { 'Washed Charcoal': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // FLORAL SHIRTS — Sky Blue
+  // ═══════════════════════════════════════════
+  {
+    id: 'floral-001',
+    name: 'Sky Blue Daisy Floral Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'floral-shirts',
+    price: 999,
+    originalPrice: 1699,
+    description: 'Premium floral print shirt in soft sky blue with white daisy patterns. Button-down collar with full sleeves. Perfect for summer outings.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Sky Blue'],
+    badge: 'NEW',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/floral-shirts/1.png'],
+    colorImages: { 'Sky Blue': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // FLORAL SHIRTS — Red
+  // ═══════════════════════════════════════════
+  {
+    id: 'floral-002',
+    name: 'Red Daisy Floral Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'floral-shirts',
+    price: 1099,
+    originalPrice: 1799,
+    description: 'Vibrant red floral shirt with white daisy and scallop pattern. Premium lightweight fabric. Full sleeves with button-down front. SPY exclusive.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Red'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/floral-shirts/2.png'],
+    colorImages: { 'Red': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // FLORAL SHIRTS — Navy
+  // ═══════════════════════════════════════════
+  {
+    id: 'floral-003',
+    name: 'Navy Daisy Floral Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'floral-shirts',
+    price: 949,
+    originalPrice: 1599,
+    description: 'Elegant navy floral shirt with white daisy motifs and scallop border pattern. Premium fabric. Available in M to XL.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Navy'],
+    badge: 'BESTSELLER',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/floral-shirts/3.png'],
+    colorImages: { 'Navy': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // CHECK SHIRTS — Plaid Multi-color
+  // ═══════════════════════════════════════════
+  {
+    id: 'check-001',
+    name: 'Classic Plaid Check Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'check-shirts',
+    price: 899,
+    originalPrice: 1499,
+    description: 'Premium check pattern casual shirt in soft linen-blend cotton. Classic button-down collar with a relaxed modern fit. Perfect for everyday style.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Multi Check'],
+    badge: 'BESTSELLER',
+    atmosphere: 'clothing',
+    images: ['/products/instagram/check-shirts/1.png'],
+    colorImages: { 'Multi Check': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // CHECK SHIRTS — Wine tone
+  // ═══════════════════════════════════════════
+  {
+    id: 'check-002',
+    name: 'Wine Tone Check Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'check-shirts',
+    price: 999,
+    originalPrice: 1599,
+    description: 'Vintage-inspired wine-tone check shirt with a contemporary fit. Premium linen-blend fabric with subtle texture. Ideal for layered streetwear looks.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Wine Check'],
+    badge: null,
+    atmosphere: 'clothing',
+    images: ['/products/instagram/check-shirts/2.png'],
+    colorImages: { 'Wine Check': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // CHECK SHIRTS — Summer Grid
+  // ═══════════════════════════════════════════
+  {
+    id: 'check-003',
+    name: 'Summer Grid Check Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'check-shirts',
+    price: 849,
+    originalPrice: 1399,
+    description: 'Lightweight grid check shirt for summer wear. Breathable fabric with relaxed fit. SPY quality craftsmanship.',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: ['Blue Grid'],
+    badge: 'NEW',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=800&q=80'],
+    colorImages: { 'Blue Grid': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // ZIPPER SHIRTS — Abstract Art
+  // ═══════════════════════════════════════════
+  {
+    id: 'zipper-001',
+    name: 'Abstract Art Zipper Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'zipper-shirts',
+    price: 1199,
     originalPrice: 1999,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Royal Blue', 'Black'],
-    badge: null,
-    fit: 'Oversized Fit',
-    stock: 40,
-    collection: null,
-    description: 'Oversized polo with signature piping details.',
-    images: ['/images/products/polo-blue.png'],
-    colorImages: {},
+    description: 'Unique zipper-closure shirt with bold abstract art print. Premium quality fabric with artistic multicolor splash pattern. Statement piece for trendsetters.',
+    sizes: ['S', 'M', 'L'],
+    colors: ['Multi Art'],
+    badge: 'EXCLUSIVE',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=800&q=80'],
+    colorImages: { 'Multi Art': 0 },
   },
+
+  // ═══════════════════════════════════════════
+  // ZIPPER SHIRTS — Dark Print
+  // ═══════════════════════════════════════════
   {
-    id: 'ai-jogger-001',
-    name: 'Korean Joggers: Black',
-    brand: 'Cult Clothing',
+    id: 'zipper-002',
+    name: 'Premium Zipper Detail Shirt',
+    brand: 'SPY',
     category: 'clothing',
-    subcategory: 'joggers',
-    price: 1599,
+    subcategory: 'zipper-shirts',
+    price: 1099,
+    originalPrice: 1799,
+    description: 'Modern zipper shirt with clean lines and premium finish. Unique zipper closure adds an edgy detail to a classic silhouette.',
+    sizes: ['S', 'M', 'L'],
+    colors: ['Dark Print'],
+    badge: 'NEW',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=800&q=80'],
+    colorImages: { 'Dark Print': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // LINEN SHIRTS — Beach Collection
+  // ═══════════════════════════════════════════
+  {
+    id: 'linen-001',
+    name: 'Premium Beach Linen Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'linen-shirts',
+    price: 999,
+    originalPrice: 1599,
+    description: 'Breathable pure linen shirt with mandarin collar and rolled-up sleeves. Perfect for beach days and summer outings.',
+    sizes: ['S', 'M', 'L'],
+    colors: ['Coral'],
+    badge: 'BESTSELLER',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800&q=80'],
+    colorImages: { 'Coral': 0 },
+  },
+
+  {
+    id: 'linen-002',
+    name: 'White Linen Beach Shirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'linen-shirts',
+    price: 899,
+    originalPrice: 1499,
+    description: 'Classic white pure linen shirt with mandarin collar. Lightweight and breathable for summer. All India delivery available.',
+    sizes: ['S', 'M', 'L'],
+    colors: ['White'],
+    badge: null,
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1603252109303-2751441dd157?w=800&q=80'],
+    colorImages: { 'White': 0 },
+  },
+
+  {
+    id: 'linen-003',
+    name: 'Linen Mandarin Collar Collection',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'linen-shirts',
+    price: 949,
+    originalPrice: 1499,
+    description: 'Premium linen shirts with mandarin collar in versatile tones. Lightweight and breathable. Available in multiple colors.',
+    sizes: ['S', 'M', 'L'],
+    colors: ['Beige'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80'],
+    colorImages: { 'Beige': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // BARREL FIT BAGGYS
+  // ═══════════════════════════════════════════
+  {
+    id: 'barrel-001',
+    name: 'Barrel Fit Baggy Jeans - Multi Wash',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'barrel-fit',
+    price: 1299,
     originalPrice: 1999,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-    colors: ['Black', 'Grey'],
-    badge: null,
-    fit: 'Korean Fit',
-    stock: 40,
-    collection: 'korean-collection',
-    description: 'Premium interlock fabric Korean fit joggers.',
-    images: ['/images/products/korean-joggers-black.png'],
-    colorImages: {},
-  },
-  {
-    id: 'ai-pants-001',
-    name: 'Easy Pants: Kohl Black',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'pants',
-    price: 1899,
-    originalPrice: 2399,
-    sizes: ['28', '30', '32', '34', '36'],
-    colors: ['Black', 'Navy'],
-    badge: null,
-    fit: 'Classic Fit',
-    stock: 35,
-    collection: 'office-edit',
-    description: 'Smart casual easy pants with elastic waistband.',
-    images: ['/images/products/easy-pants-black.png'],
-    colorImages: {},
-  },
-  {
-    id: 'ai-pants-002',
-    name: 'Gurkha Pants: Cedar',
-    brand: 'Cult Clothing',
-    category: 'clothing',
-    subcategory: 'pants',
-    price: 2499,
-    originalPrice: 2999,
+    description: 'Premium barrel fit baggy jeans available in multiple washes. Wide-leg silhouette with tapered ankle. Korean street style inspired. Sizes 28 to 34.',
     sizes: ['28', '30', '32', '34'],
-    colors: ['Cedar', 'Olive'],
-    badge: null,
-    fit: 'Tapered Fit',
-    stock: 20,
-    collection: 'old-money',
-    description: 'Premium Gurkha pants with double-tab adjustable waist.',
-    images: ['/images/products/gurkha-pants-cedar.png'],
-    colorImages: {},
+    colors: ['Acid Blue', 'Black', 'Grey'],
+    badge: 'BESTSELLER',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80'],
+    colorImages: { 'Acid Blue': 0, 'Black': 0, 'Grey': 0 },
   },
+
   {
-    id: 'ai-shirt-002',
-    name: 'Hawaiian Resort Shirt',
-    brand: 'Cult Clothing',
+    id: 'barrel-002',
+    name: 'Charcoal Barrel Fit Denim',
+    brand: 'SPY',
     category: 'clothing',
-    subcategory: 'shirts',
+    subcategory: 'barrel-fit',
+    price: 1399,
+    originalPrice: 2199,
+    description: 'Premium quality charcoal barrel fit denim with vintage wash treatment. Wide barrel leg with subtle taper. The must-have Korean fit for 2026.',
+    sizes: ['28', '30', '32', '34'],
+    colors: ['Charcoal'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80'],
+    colorImages: { 'Charcoal': 0 },
+  },
+
+  {
+    id: 'barrel-003',
+    name: 'Barrel Fit Cargo Baggy',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'barrel-fit',
     price: 1499,
-    originalPrice: 1999,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Multi'],
+    originalPrice: 2299,
+    description: 'Barrel fit cargo-style baggy with utility pockets and SPY branding. Heavy-duty washed denim. The ultimate streetwear bottom.',
+    sizes: ['28', '30', '32', '34', '36'],
+    colors: ['Acid Wash Blue'],
+    badge: 'NEW',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=800&q=80'],
+    colorImages: { 'Acid Wash Blue': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // DENIM BAGGYS
+  // ═══════════════════════════════════════════
+  {
+    id: 'denim-baggy-001',
+    name: 'Classic Denim Baggy Pants',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'denim-baggys',
+    price: 1099,
+    originalPrice: 1799,
+    description: 'Classic wide-leg denim baggy pants. Premium denim with comfortable waistband. Sizes 28 to 34. All India delivery available.',
+    sizes: ['28', '30', '32', '34'],
+    colors: ['Light Grey', 'Medium Wash'],
+    badge: 'TRENDING',
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=800&q=80'],
+    colorImages: { 'Light Grey': 0, 'Medium Wash': 0 },
+  },
+
+  {
+    id: 'denim-baggy-002',
+    name: 'Faded Denim Wide Leg',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'denim-baggys',
+    price: 1199,
+    originalPrice: 1899,
+    description: 'Faded wash wide-leg denim with vintage distressing. Relaxed comfortable fit with premium stitching details. SPY branded.',
+    sizes: ['28', '30', '32', '34'],
+    colors: ['Faded Blue'],
     badge: null,
-    fit: 'Relaxed Fit',
-    stock: 45,
-    collection: 'summer-shirts',
-    description: 'Vibrant tropical print resort shirt for the summer season.',
-    images: ['/images/products/hawaiian-shirt.png'],
-    colorImages: {},
+    atmosphere: 'clothing',
+    images: ['https://images.unsplash.com/photo-1475178626620-a4d074967452?w=800&q=80'],
+    colorImages: { 'Faded Blue': 0 },
+  },
+
+  // ═══════════════════════════════════════════
+  // PRINTED SWEATSHIRTS
+  // ═══════════════════════════════════════════
+  {
+    id: 'sweat-001',
+    name: 'Hollywood Back Print Sweatshirt',
+    brand: 'SPY',
+    category: 'clothing',
+    subcategory: 'sweatshirts',
+    price: 1299,
+    originalPrice: 1999,
+    description: 'Premium acid-washed sweatshirt with bold Hollywood-inspired back print. Available in multiple colors. Oversized fit with dropped shoulders.',
+    sizes: ['M', 'L', 'XL'],
+    colors: ['Burgundy', 'Sage Green', 'Rust', 'White'],
+    badge: 'EXCLUSIVE',
+    atmosphere: 'clothing',
+    images: [
+      'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80',
+      'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80',
+    ],
+    colorImages: { 'Burgundy': 0, 'Sage Green': 0, 'Rust': 1, 'White': 1 },
   },
 ];
 
-// ═══ Query Helpers ═══
+// ═══════════════════════════════════════════
+// QUERY HELPERS (Matching old dummyData interface)
+// ═══════════════════════════════════════════
 
-export function getAllDummyProducts() {
-  return DUMMY_PRODUCTS;
-}
+export const DUMMY_PRODUCTS = products;
 
-export function getDummyProductById(id) {
-  return DUMMY_PRODUCTS.find(p => p.id === id) || null;
-}
-
-export function getDummyProductsBySubcategory(subcategory) {
-  return DUMMY_PRODUCTS.filter(p => p.subcategory === subcategory);
-}
-
-export function getDummyFeaturedProducts() {
-  return DUMMY_PRODUCTS.filter(p => ['BESTSELLER', 'TRENDING'].includes(p.badge));
-}
-
-export function getDummyNewArrivals() {
-  return DUMMY_PRODUCTS.filter(p => ['NEW', 'EXCLUSIVE'].includes(p.badge));
-}
-
-export function getDummyProductsByCollection(slug) {
-  return DUMMY_PRODUCTS.filter(p => p.collection === slug);
-}
+export function getAllDummyProducts() { return DUMMY_PRODUCTS; }
+export function getDummyProductById(id) { return DUMMY_PRODUCTS.find(p => p.id === id) || null; }
+export function getDummyProductsBySubcategory(sub) { return DUMMY_PRODUCTS.filter(p => p.subcategory === sub); }
+export function getDummyFeaturedProducts() { return DUMMY_PRODUCTS.filter(p => ['BESTSELLER','TRENDING'].includes(p.badge)); }
+export function getDummyNewArrivals() { return DUMMY_PRODUCTS.filter(p => ['NEW','EXCLUSIVE'].includes(p.badge)); }
+export function getDummyProductsByCollection(slug) { return DUMMY_PRODUCTS.filter(p => p.collection === slug); }

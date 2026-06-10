@@ -1,5 +1,5 @@
 /**
- * Cult Clothing — Flat 10% Discount on All Items
+ * SPY Multibrand Stores — Flat 10% Discount on All Items
  */
 
 export const DISCOUNT_RATE = 0.10;
@@ -36,7 +36,7 @@ export function computeCartTotals(items) {
  */
 export function buildWhatsAppMessage(itemBreakdown, totals) {
   const fmt = (n) => n.toLocaleString('en-IN');
-  const lines = ['🛍️ *NEW ORDER — Cult Clothing*', ''];
+  const lines = ['🛍️ *NEW ORDER — SPY Multibrand Stores*', ''];
 
   itemBreakdown.forEach((item, idx) => {
     const discount = item.rate > 0

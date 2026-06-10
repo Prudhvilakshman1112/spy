@@ -5,6 +5,6 @@ export default function robots() {
       allow: '/',
       disallow: ['/api/', '/_next/'],
     },
-    sitemap: 'https://brand2brands.vercel.app/sitemap.xml',
+    sitemap: 'https://spymultibrand.vercel.app/sitemap.xml',
   };
 }

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-const BASE_URL = 'https://cultclothing.vercel.app';
+const BASE_URL = 'https://spymultibrand.vercel.app';
 
 export default async function sitemap() {
   // Static pages

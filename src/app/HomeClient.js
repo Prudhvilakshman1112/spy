@@ -5,42 +5,42 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 
-/* ── Hero Carousel Slides (Real product images first) ── */
+/* ── Hero Slides — real store images ── */
 const HERO_SLIDES = [
-  { image: '/catalog/floral-shirts/1.jpg', title: 'FLORAL SHIRTS', subtitle: 'PREMIUM | PRINTED | VIBRANT', tag: 'BESTSELLER' },
-  { image: '/catalog/tshirts/1.jpg', title: 'T-SHIRTS', subtitle: 'OVERSIZED | PRINTED | STREETWEAR', tag: 'NEW DROP' },
-  { image: '/catalog/barrel-fit-baggys/1.jpg', title: 'BARREL FIT BAGGYS', subtitle: 'KOREAN | BAGGY | PREMIUM', tag: 'TRENDING' },
-  { image: '/catalog/linen-shirts/1.jpg', title: 'LINEN SHIRTS', subtitle: 'BREATHABLE | SUMMER | COMFORT', tag: "SUMMER'26" },
-  { image: '/catalog/denim-baggys/1.jpg', title: 'DENIM BAGGYS', subtitle: 'PREMIUM DENIM | RELAXED FIT', tag: 'NEW' },
+  { image: '/images/banners/hero-1.png', title: 'NEW ARRIVALS', subtitle: 'PREMIUM | CURATED | STYLE', tag: 'BESTSELLER' },
+  { image: '/images/banners/hero-2.png', title: 'GRAPHIC TEES', subtitle: 'OVERSIZED | VINTAGE | STREETWEAR', tag: 'NEW DROP' },
+  { image: '/images/banners/hero-3.png', title: 'FLORAL SHIRTS', subtitle: 'PASTEL | PRINTED | SUMMER', tag: 'TRENDING' },
+  { image: '/images/banners/hero-4.png', title: 'BARREL FIT DENIM', subtitle: 'KOREAN | BAGGY | PREMIUM', tag: "SUMMER'26" },
+  { image: '/images/banners/hero-5.png', title: 'STREETWEAR', subtitle: 'KOREAN FIT | OVERSIZED | DROP', tag: 'NEW' },
 ];
 
-/* ── Category Cards (Real product images) ── */
+/* ── Category Cards — AI generated product images ── */
 const CATEGORIES = [
-  { name: 'T-SHIRTS', slug: 't-shirts', image: '/catalog/tshirts/3.jpg' },
-  { name: 'SHIRTS', slug: 'shirts', image: '/catalog/floral-shirts/2.jpg' },
-  { name: 'LINEN SHIRTS', slug: 'shirts', image: '/catalog/linen-shirts/2.jpg' },
-  { name: 'JEANS', slug: 'jeans', image: '/catalog/denim-baggys/2.jpg' },
-  { name: 'PANTS', slug: 'pants', image: '/catalog/barrel-fit-baggys/3.jpg' },
-  { name: 'SWEATSHIRTS', slug: 't-shirts', image: '/catalog/sweatshirts/1.jpg' },
+  { name: 'T-SHIRTS', slug: 't-shirts', image: '/products/instagram/tshirts/1.png' },
+  { name: 'FLORAL SHIRTS', slug: 'floral-shirts', image: '/products/instagram/floral-shirts/1.png' },
+  { name: 'CHECK SHIRTS', slug: 'check-shirts', image: '/products/instagram/check-shirts/1.png' },
+  { name: 'BARREL FIT', slug: 'barrel-fit', image: '/products/instagram/barrel-fit/1.png' },
+  { name: 'LINEN SHIRTS', slug: 'linen-shirts', image: '/products/instagram/linen-shirts/1.png' },
+  { name: 'SWEATSHIRTS', slug: 'sweatshirts', image: '/products/instagram/sweatshirts/1.png' },
 ];
 
-/* ── Collection Cards (Real product images) ── */
+/* ── Collection Cards — AI generated product images ── */
 const COLLECTIONS = [
-  { name: 'FLORAL PRINTS', slug: 'summer-shirts', image: '/catalog/floral-shirts/4.jpg' },
-  { name: 'KOREAN COLLECTION', slug: 'korean-collection', image: '/catalog/barrel-fit-baggys/5.jpg' },
-  { name: 'CHECK SHIRTS', slug: null, image: '/catalog/check-shirts/1.jpg' },
-  { name: 'CULT CLASSICS', slug: 'cult-classics', image: '/catalog/tshirts/6.jpg' },
-  { name: 'CULTURE CODE', slug: 'culture-code', image: '/catalog/sweatshirts/2.jpg' },
-  { name: 'SUMMER SHIRTS', slug: 'summer-shirts', image: '/catalog/linen-shirts/3.jpg' },
+  { name: 'ZIPPER SHIRTS', slug: 'zipper-shirts', image: '/products/instagram/zipper-shirts/1.png' },
+  { name: 'KOREAN STYLE', slug: 'barrel-fit', image: '/products/instagram/barrel-fit/2.png' },
+  { name: 'DENIM BAGGYS', slug: 'denim-baggys', image: '/products/instagram/denim-baggys/1.png' },
+  { name: 'SPY PICKS', slug: 't-shirts', image: '/products/instagram/tshirts/2.png' },
+  { name: 'BEACH LINEN', slug: 'linen-shirts', image: '/products/instagram/linen-shirts/2.png' },
+  { name: 'STREET STYLE', slug: 'sweatshirts', image: '/products/instagram/sweatshirts/2.png' },
 ];
 
 /* ── Filter tabs for catalog ── */
 const FILTER_TABS = [
   { slug: '', label: 'Trending' },
   { slug: 't-shirts', label: 'T-Shirts' },
-  { slug: 'shirts', label: 'Shirts' },
-  { slug: 'pants', label: 'Baggys & Pants' },
-  { slug: 'jeans', label: 'Denim' },
+  { slug: 'floral-shirts', label: 'Floral Shirts' },
+  { slug: 'barrel-fit', label: 'Barrel Fit' },
+  { slug: 'check-shirts', label: 'Check Shirts' },
 ];
 
 /* ══════════════════════════════════════════════
@@ -50,10 +50,7 @@ function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrent(p => (p + 1) % HERO_SLIDES.length), 4000);
-    return () => clearInterval(timer);
-  }, []);
+  // Removed auto-sliding per user request
 
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e) => {
@@ -68,12 +65,12 @@ function HeroCarousel() {
   };
 
   return (
-    <div className="hero-carousel" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <div className="hero-carousel" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} style={{ touchAction: 'pan-y' }}>
       <div className="hero-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         {HERO_SLIDES.map((slide, i) => (
           <div className="hero-carousel-slide" key={i}>
             <Image src={slide.image} alt={slide.title} fill sizes="100vw" priority={i === 0}
-              style={{ objectFit: 'cover' }} />
+              style={{ objectFit: 'cover' }} draggable={false} />
             <div className="hero-carousel-overlay">
               <div className="hero-carousel-text">
                 <h2>{slide.title}</h2>
@@ -208,9 +205,11 @@ export default function HomeClient({ featured, newArrivals, allProducts }) {
     : featured.length > 0 ? featured : allProducts.slice(0, 8);
 
   // Get specific products for trending section
-  const trendingPants = allProducts.filter(p => p.subcategory === 'pants');
-  const easyPants = trendingPants[0] || allProducts[0];
-  const gurkhaPants = trendingPants[1] || allProducts[1];
+  const barrelFitProducts = allProducts.filter(p => p.subcategory === 'barrel-fit');
+  const denimBaggyProducts = allProducts.filter(p => p.subcategory === 'denim-baggys');
+  const trendingBottoms = [...barrelFitProducts, ...denimBaggyProducts];
+  const easyPants = barrelFitProducts[0] || allProducts[0];
+  const gurkhaPants = denimBaggyProducts[0] || barrelFitProducts[1] || allProducts[1];
 
   return (
     <>
@@ -225,7 +224,7 @@ export default function HomeClient({ featured, newArrivals, allProducts }) {
         <div className="container">
           <h2 className="section-heading">LATEST DROPS</h2>
           <Link href="/clothing?filter=new" className="latest-drops-banner">
-            <Image src="/catalog/zipper-shirts/1.jpg" alt="Latest Drops"
+            <Image src="/images/banners/latest-drops.png" alt="Latest Drops"
               fill sizes="100vw" style={{ objectFit: 'cover' }} />
             <div className="latest-drops-overlay">
               <span className="latest-drops-tag">JUST DROPPED</span>
@@ -264,11 +263,11 @@ export default function HomeClient({ featured, newArrivals, allProducts }) {
         </div>
       </section>
 
-      {/* ═══ TRENDING IN PANTS ═══ */}
+      {/* ═══ TRENDING IN BAGGYS ═══ */}
       {easyPants && gurkhaPants && (
         <section className="section-block" id="trending-pants">
           <div className="container">
-            <h2 className="section-heading">TRENDING IN PANTS</h2>
+            <h2 className="section-heading">TRENDING IN BAGGYS</h2>
             <div className="trending-grid">
               <TrendingCard
                 product={easyPants}
@@ -288,7 +287,7 @@ export default function HomeClient({ featured, newArrivals, allProducts }) {
               />
             </div>
             <ScrollCarousel
-              items={trendingPants.length > 2 ? trendingPants : allProducts.filter(p => ['pants', 'joggers'].includes(p.subcategory))}
+              items={trendingBottoms.length > 2 ? trendingBottoms : allProducts.filter(p => ['barrel-fit', 'denim-baggys', 'jeans'].includes(p.subcategory))}
               renderItem={(product) => <ProductCard product={product} compact />}
             />
           </div>
@@ -299,9 +298,9 @@ export default function HomeClient({ featured, newArrivals, allProducts }) {
       <section className="section-block" id="curated">
         <div className="container">
           <h2 className="section-heading">CURATED FOR YOU</h2>
-          <div className="collections-grid">
+        <div className="collections-grid">
             {COLLECTIONS.map(col => (
-              <Link key={col.name} href={col.slug ? `/clothing?collection=${col.slug}` : '/clothing'} className="collection-card">
+              <Link key={col.name} href={col.slug ? `/clothing?subcategory=${col.slug}` : '/clothing'} className="collection-card">
                 <div className="collection-card-img">
                   <Image src={col.image} alt={col.name} fill sizes="33vw"
                     style={{ objectFit: 'cover' }} />

@@ -78,13 +78,13 @@ const PRODUCT_SELECT = `
 // ─── Dummy subcategories ───
 const DUMMY_SUBCATEGORIES = [
   { id: 1, name: 'T-Shirts', slug: 't-shirts' },
-  { id: 2, name: 'Shirts', slug: 'shirts' },
-  { id: 3, name: 'Polos', slug: 'polos' },
-  { id: 4, name: 'Jeans', slug: 'jeans' },
-  { id: 5, name: 'Pants', slug: 'pants' },
-  { id: 6, name: 'Joggers', slug: 'joggers' },
-  { id: 7, name: 'Shorts', slug: 'shorts' },
-  { id: 8, name: 'Hoodies & Sweatshirts', slug: 'hoodies-sweatshirts' },
+  { id: 2, name: 'Floral Shirts', slug: 'floral-shirts' },
+  { id: 3, name: 'Check Shirts', slug: 'check-shirts' },
+  { id: 4, name: 'Zipper Shirts', slug: 'zipper-shirts' },
+  { id: 5, name: 'Linen Shirts', slug: 'linen-shirts' },
+  { id: 6, name: 'Barrel Fit', slug: 'barrel-fit' },
+  { id: 7, name: 'Denim Baggys', slug: 'denim-baggys' },
+  { id: 8, name: 'Sweatshirts', slug: 'sweatshirts' },
 ];
 
 // ─── Query Functions ───

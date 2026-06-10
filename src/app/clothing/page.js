@@ -4,9 +4,9 @@ import ClothingClient from './ClothingClient';
 export const revalidate = 3600;
 
 export const metadata = {
-  title: "Shop Men's Clothing | Cult Clothing",
-  description: "Browse premium men's clothing — T-Shirts, Shirts, Polos, Jeans, Joggers & more at Cult Clothing.",
-  keywords: "men's clothing, t-shirts, shirts, jeans, joggers, Cult Clothing, Vizag",
+  title: "Shop Men's Clothing | SPY Multibrand Stores",
+  description: "Browse premium men's clothing — T-Shirts, Shirts, Polos, Jeans, Joggers & more at SPY Multibrand Stores.",
+  keywords: "men's clothing, t-shirts, shirts, jeans, joggers, SPY Multibrand Stores, Visakhapatnam",
 };
 
 export default async function ClothingPage({ searchParams }) {

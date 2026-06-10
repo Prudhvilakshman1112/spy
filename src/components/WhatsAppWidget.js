@@ -3,7 +3,7 @@
 export default function WhatsAppWidget() {
   return (
     <a
-      href="https://wa.me/919951565569?text=Hi! I'm interested in Cult Clothing products."
+      href="https://wa.me/918756799899?text=Hi! I'm interested in SPY Multibrand Stores products."
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-widget"

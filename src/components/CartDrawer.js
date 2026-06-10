@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { buildWhatsAppMessage } from '@/lib/discounts';
 
-const OWNER_PHONE = '919951565569';
+const OWNER_PHONE = '918756799899';
 
 function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
 

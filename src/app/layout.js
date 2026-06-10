@@ -8,21 +8,21 @@ import Footer from '@/components/Footer';
 import WhatsAppWidget from '@/components/WhatsAppWidget';
 
 export const metadata = {
-  title: "Cult Clothing | Men's Fashion Store",
+  title: "SPY Multibrand Stores | Your Fashion Detective",
   description:
-    "Shop premium men's clothing at Cult Clothing. T-Shirts, Shirts, Polos, Jeans, Joggers & more. Men's fashion, redefined.",
-  keywords: 'Cult Clothing, men fashion, t-shirts, shirts, jeans, joggers, Vizag',
+    "Shop premium men's clothing at SPY Multibrand Stores. Uncover the latest trends in T-Shirts, Shirts, Jeans, Joggers & more. Quality that speaks style.",
+  keywords: 'SPY Multibrand Stores, men fashion, t-shirts, shirts, jeans, joggers, Visakhapatnam, Vizag',
   openGraph: {
-    title: "Cult Clothing | Men's Fashion",
-    description: "Premium Men's Fashion Store",
+    title: "SPY Multibrand Stores | Your Fashion Detective",
+    description: "Uncover the latest trends in men's fashion. Quality that speaks style.",
     type: 'website',
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <CartProvider>
           <WishlistProvider>
             <LayoutClient />

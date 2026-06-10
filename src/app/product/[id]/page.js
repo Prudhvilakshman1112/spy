@@ -19,21 +19,21 @@ export async function generateMetadata({ params }) {
 
   if (!product) {
     return {
-      title: 'Product Not Found | Cult Clothing',
+      title: 'Product Not Found | SPY Multibrand Stores',
       description: 'The product you are looking for does not exist.',
     };
   }
 
-  const title = `${product.name} | Cult Clothing`;
+  const title = `${product.name} | SPY Multibrand Stores`;
   const description = product.description
-    || `Shop ${product.name} at ₹${product.price.toLocaleString()}. Premium men's fashion at Cult Clothing, Vizag.`;
+    || `Shop ${product.name} at ₹${product.price.toLocaleString()}. Premium men's fashion at SPY Multibrand Stores, Visakhapatnam.`;
 
   return {
     title,
     description,
-    keywords: `${product.name}, Cult Clothing, Vizag fashion, men's fashion`,
+    keywords: `${product.name}, SPY Multibrand Stores, Visakhapatnam fashion, men's fashion`,
     openGraph: {
-      title: `${product.name} — Cult Clothing`,
+      title: `${product.name} — SPY Multibrand Stores`,
       description,
       type: 'website',
       images: product.images?.[0] ? [product.images[0]] : [],
