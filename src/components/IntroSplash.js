@@ -62,7 +62,7 @@ export default function IntroSplash() {
               transitionDelay: `${i * 0.06}s`,
             }}
           >
-            <Image src="/images/image.png" alt="" width={500} height={280}
+            <Image src="/images/spy-logo.jpeg" alt="" width={500} height={280}
               style={{ width: '100%', height: '100%', objectFit: 'contain' }} priority />
           </div>
         ))}
